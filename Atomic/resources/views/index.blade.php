@@ -27,7 +27,7 @@
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background-color: rgba(0, 0, 0, 0.7); /* Cor de fundo preto com 70% de transparência */
+                background-color: rgba(0, 0, 0, 0.5); /* Cor de fundo preto com 70% de transparência */
                 z-index:-1;
             }
             .hider {
@@ -169,7 +169,41 @@
                     font-size: 3.5em;
                 }
             }
-        </style>
+            .button-container {
+                min-height: 100vh;
+                display: flex;
+                text-align: center;
+            }
+            .button-container a{
+                cursor: pointer;
+                border: 0;
+                border-radius: 4px;
+                font-weight: 600;
+                margin: 0 10px;
+                width: 200px;
+                padding: 10px 6px;
+                box-shadow: 0 0 20px rgba(104, 85, 224, 0.2);
+                transition: 0.4s;
+                text-decoration: none; /* no underline */
+            }
+            .reg {
+                color: white;
+                padding: 2em;
+                background-color: rgba(104, 85, 224, 1);
+            }
+
+            .login {
+                color: rgb(104, 85, 224);
+                background-color: rgba(255, 255, 255, 1);
+                border: 1px solid rgba(104, 85, 224, 1);
+            }
+
+            .dash {
+                color: rgb(104, 85, 224);
+                background-color: rgba(255, 255, 255, 1);
+                border: 1px solid rgba(104, 85, 224, 1);
+            }
+     </style>
     </head>
     <body>
         <div class="button-container">
@@ -178,12 +212,14 @@
                     @auth
                         <a
                             href="{{ url('/dashboard') }}"
+                            class="dash"
                         >
                             Dashboard
                         </a>
                     @else
                         <a
                             href="{{ route('login') }}"
+                            class="login"
                         >
                             Log in
                         </a>
@@ -191,6 +227,7 @@
                         @if (Route::has('register'))
                             <a
                                 href="{{ route('register') }}"
+                                class="reg"
                             >
                                 Register
                             </a>
@@ -264,7 +301,7 @@
 
                 // Draw raindrops
                 for (const raindrop of raindrops) {
-                    ctx.fillStyle = 'lime';
+                    ctx.fillStyle = 'red';//lime
                     ctx.font = '10px monospace';
                     ctx.fillText(raindrop.binaryString, raindrop.x, raindrop.y);
                     raindrop.y += raindrop.speed;
