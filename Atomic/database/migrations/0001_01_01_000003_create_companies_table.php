@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
-            $table->integer('company_owner_id')->unsigned();
+            $table->foreignId('company_owner_id')->unsigned();
             $table->foreign('company_owner_id')->references('id')->on('users');
             $table->string('company_name')->unique();
             $table->timestamps();
