@@ -25,23 +25,35 @@ class User extends Authenticatable
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var array<int, string>
+     * @var array<int, string, boolean>
      */
     protected $hidden = [
         'password',
         'remember_token',
+        'global_admin',
     ];
 
     /**
      * Get the attributes that should be cast.
      *
-     * @return array<string, string>
+     * @return array<string, string, boolean>
      */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'global_admin' => 'boolean'
         ];
+    }
+    
+    /**
+     * Check if the user is a global admin.
+     *
+     * @return bool
+     */
+    public function isGlobalAdmin()
+    {
+        return $this->global_admin == 1;
     }
 }
