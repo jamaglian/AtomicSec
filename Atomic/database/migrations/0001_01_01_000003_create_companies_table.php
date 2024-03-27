@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('company_owner_id')->unsigned();
             $table->foreign('company_owner_id')->references('id')->on('users');
-            $table->string('company_name')->unique();
+            $table->string('name')->unique();
             $table->timestamps();
         });
     }

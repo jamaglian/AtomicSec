@@ -5,9 +5,9 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Companies>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Applications>
  */
-class CompaniesFactory extends Factory
+class ApplicationsFactory extends Factory
 {
 
     /**
@@ -18,8 +18,9 @@ class CompaniesFactory extends Factory
     public function definition(): array
     {
         return [
-            'company_owner_id' => 0,
-            'name' => fake()->name()
+            'company_id' => 0,
+            'name' => fake()->name(),
+            'url'  => fake()->unique()->url()
         ];
     }
 }

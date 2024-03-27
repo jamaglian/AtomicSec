@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Companies extends Model
+class Applications extends Model
 {
     use HasFactory, Notifiable;
 
@@ -16,7 +16,10 @@ class Companies extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'company_owner_id',
-        'name'
+        'company_id',
+        'name',
+        'type',
+        'analysis'
+
     ];
 }
