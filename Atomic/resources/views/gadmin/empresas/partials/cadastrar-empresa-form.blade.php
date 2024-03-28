@@ -8,7 +8,7 @@
     <form method="post" action="{{ route('gadmin_companies.register') }}" class="mt-6 space-y-6">
         @csrf
 
-        <span>Usuário dono da empresa</span>
+        <span class="block font-medium text-sm text-gray-700 dark:text-gray-300">Usuário dono da empresa</span>
         <div>
             <x-input-label for="name" :value="__('Name')" />
             <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" value="{{ old('name') }}" required autofocus autocomplete="name" />
@@ -34,7 +34,7 @@
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
         <br/>
-        <span>Empresa</span>
+        <span class="block font-medium text-sm text-gray-700 dark:text-gray-300">Empresa</span>
 
         <div>
             <x-input-label for="c_name" :value="__('Name')" />
