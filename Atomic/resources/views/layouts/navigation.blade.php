@@ -17,6 +17,13 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
                 </div>
+                @if(Auth::user()->isGlobalAdmin() )   
+                    <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                        <x-nav-link :href="route('gadmin_companies.list')" :active="request()->routeIs('gadmin_companies.list')">
+                            {{ __('Empresas') }}
+                        </x-nav-link>
+                    </div>
+                @endif
             </div>
 
             <!-- Settings Dropdown -->

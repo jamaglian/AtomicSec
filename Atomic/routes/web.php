@@ -2,8 +2,8 @@
 
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Middleware\CheckGlobalAdmin;
 use App\Http\Controllers\ProfileController;
+
 
 Route::get('/', function () {
     return view('index');
@@ -19,14 +19,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::middleware([CheckGlobalAdmin::class, 'auth'])->group(function () {
-    Route::prefix('gadmin')->group(function () {
-        Route::get('/', function () {
-            return view('index');
-        });
-    });
-});
-
 if(config('app.debug')){
     Route::get('/mail', function () {
         return redirect()->away('http://localhost:8025');
@@ -37,3 +29,4 @@ if(config('app.debug')){
 }
 
 require __DIR__.'/auth.php';
+require __DIR__.'/gadmin.php';

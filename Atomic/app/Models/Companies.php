@@ -19,4 +19,9 @@ class Companies extends Model
         'company_owner_id',
         'name'
     ];
+
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'company_owner_id');
+    }
 }
