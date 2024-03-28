@@ -1,29 +1,40 @@
-/**
- * @name Youtube search
- *
- * @desc  Looks for Fleetwood Mac's "Dreams" video on youtube.com and clicks on the third video.
- * Waits for 5 seconds for the video to load.
- */
-const puppeteer = require('puppeteer')
-const screenshot = 'youtube_fm_dreams_video.png'
-try {
-  (async () => {
-    const browser = await puppeteer.launch({headless: false})
-    const page = await browser.newPage()
-
-    await page.goto('https://google.com.br')
-    await page.type('#APjFqb', 'Estou testando')
-    /*await page.click('button#search-icon-legacy')
-    await page.waitForSelector('ytd-thumbnail.ytd-video-renderer')
-    await page.screenshot({ path: 'youtube_fm_dreams_list.png' })
-    const videos = await page.$$('ytd-thumbnail.ytd-video-renderer')
-    await videos[2].click()
-    await page.waitForSelector('.html5-video-container')
-    await page.waitFor(5000)
-    await page.screenshot({ path: screenshot })
-    await browser.close()
-    console.log('See screenshot: ' + screenshot)*/
-  })()
-} catch (err) {
-  console.error(err)
+import scrape from 'website-scraper'; // only as ESM, no CommonJS
+import AnalyzerAgentPlugin from './libs/AnalyzerAgentPlugin.js'; // only as ESM, no CommonJS
+const url_scrape = '';
+/*
+class MyPlugin {
+	apply(registerAction) {
+		registerAction('beforeStart', async ({options}) => {});
+		registerAction('afterFinish', async () => {});
+		registerAction('error', async ({error}) => {console.error(error)});
+		registerAction('beforeRequest', async ({resource, requestOptions}) => ({requestOptions}));
+		registerAction('afterResponse', async ({response}) => response.body);
+		registerAction('onResourceSaved', ({resource}) => {});
+		registerAction('onResourceError', ({resource, error}) => {});
+		registerAction('saveResource', async ({resource}) => {});
+		registerAction('generateFilename', async ({resource}) => {})
+		registerAction('getReference', async ({resource, parentResource, originalReference}) => {})
+	}
 }
+*/
+console.log(process.argv)
+const options = {
+  urls: [url_scrape],
+  urlFilter: (url) => url.startsWith(url_scrape), // Filter links to other websites
+  recursive: true,
+  filenameGenerator: 'bySiteStructure',
+  directory: 'teste/',
+  request: {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'
+    }
+  },
+  plugins: [ 
+    new AnalyzerAgentPlugin({
+      launchOptions: {  }
+    })
+  ]
+};
+
+// with async/await
+const result = await scrape(options);
