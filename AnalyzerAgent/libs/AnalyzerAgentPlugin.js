@@ -22,12 +22,14 @@ class AnalyzerAgentPlugin {
 		launchOptions = {},
         ignoreCss = true,
         ignoreJs = true,
-        ignoreImages = true
+        ignoreImages = true,
+        all_times = false
 	} = {}) {
 		this.launchOptions = launchOptions;
         this.ignoreCss = ignoreCss;
         this.ignoreJs = ignoreJs;
         this.ignoreImages = ignoreImages;
+        this.all_times = all_times;
         this.possibleCMS = false;
         this.resultadoPath = 'resultado.json';
         this.resultadoJson = JSON.parse(fs.readFileSync(this.resultadoPath, 'utf8'));
@@ -40,7 +42,7 @@ class AnalyzerAgentPlugin {
 
 	apply (registerAction) {
 		registerAction('beforeRequest', async ({resource, requestOptions}) => {
-            var uri = resource.getUrl().split('?')[0];
+            var uri = resource.getUrl().split('?')[0].toLowerCase();
             this.identifyWp(uri);
             if(this.ignoreCss && uri.endsWith(".css")){
                 logger.info('Ignorando css:', { uri });
@@ -62,26 +64,28 @@ class AnalyzerAgentPlugin {
         registerAction('saveResource', async ({resource}) => {return false;});
         registerAction('afterResponse', ({response}) => {
             const url = response.url
-            const excludedPhases = ['dns', 'tcp', 'tls', 'request']; // Fases a serem excluídas
-            const totalExcludedTime = excludedPhases.reduce((acc, phase) => {
-                return acc + (response.timings.phases[phase] || 0); // Soma os tempos das fases excluídas
-            }, 0);
-            const serverProcessingTime = response.timings.phases.total - totalExcludedTime;
+            var serverProcessingTime = 0
+            if(response.timings.secureConnect !== undefined){
+                const excludeUpload = response.timings.upload - response.timings.secureConnect
+                serverProcessingTime = (response.timings.response - response.timings.secureConnect) - excludeUpload;
+            }else{
+                const excludeUpload = response.timings.upload - response.timings.connect
+                serverProcessingTime = response.timings.response - response.timings.connect;
+            }
             if(this.serverRequestTimeMap[url] !== undefined){
                 this.serverRequestTimeMap[url].push({ 
                     serverProcessingTime: serverProcessingTime,
-                    timings: response.timings.phases
+                    timings: this.all_times ? response.timings : null
                 });
             }else{
                 this.serverRequestTimeMap[url] = [];
                 this.serverRequestTimeMap[url].push({ 
                     serverProcessingTime: serverProcessingTime,
-                    timings: response.timings.phases
+                    timings: this.all_times ? response.timings : null
                 });
             }
             logger.info('Gravando tempo de resposta:', { url });
             logger.info('O tempo de resposta do servidor foi:', { serverProcessingTime });
-            //console.log(response.timings.phases)
             return response;
         });
         registerAction('afterFinish', async () => {

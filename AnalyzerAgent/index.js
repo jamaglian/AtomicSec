@@ -6,12 +6,14 @@ var url_scrape = '';
 var ignoreCss = true;
 var ignoreJs = true;
 var ignoreImages = true;
+var all_times = false;
 const regex = /^(?:https?|ftp):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?$/;
 
 
 if(process.argv.length < 3 || !regex.test(process.argv[2])){
   console.log("Utilize \"node index.js https://site.para.testar/ [argumentos]\"");
   console.log("-includeAsset=css (pode utilizar 'css,js,img')")
+  console.log("-all_times (para mostrar o tempo de requisição completo)")
   process.exit(1); // Encerra o programa com código de erro
 }
 
@@ -19,9 +21,9 @@ url_scrape = process.argv[2]
 
 if(process.argv.length > 3){
   process.argv.forEach(element => {
-    const startIndex = element.indexOf("-includeAsset=");
-    if(startIndex !== -1){
-      const depois = element.slice(startIndex + "-includeAsset=".length);
+    const startIndexIncludeAsset = element.indexOf("-includeAsset=");
+    if(startIndexIncludeAsset !== -1){
+      const depois = element.slice(startIndexIncludeAsset + "-includeAsset=".length);
       if(depois.indexOf("css") !== -1){
         ignoreCss = false;
       }
@@ -31,6 +33,10 @@ if(process.argv.length > 3){
       if(depois.indexOf("img") !== -1){
         ignoreImages = false;
       }
+    }
+    const startIndexAllTimes = element.indexOf("-all_times");
+    if(startIndexAllTimes !== -1){
+      all_times = true;
     }
   });
 }
@@ -62,7 +68,8 @@ const options = {
       launchOptions: {  },
       ignoreCss: ignoreCss,
       ignoreJs: ignoreJs,
-      ignoreImages: ignoreImages
+      ignoreImages: ignoreImages,
+      all_times: all_times
     })
   ]
 };
