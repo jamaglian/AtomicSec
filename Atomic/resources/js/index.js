@@ -21,9 +21,7 @@ function generateBinaryString(length) {
 
 // Create binary raindrop object
 function createRaindrop() {
-    //const speed = Math.random() * 5 + 1; // Random speed
     const speed = Math.random() * 5 + 1; // Random speed
-    //const length = Math.random() * 20 + 10; // Random length
     const length = Math.random() * 400 + 10; // Random length
     const x = Math.random() * canvas.width; // Random horizontal position
     const y = -length; // Start above the canvas
