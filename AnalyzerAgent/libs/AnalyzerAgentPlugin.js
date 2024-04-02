@@ -36,7 +36,6 @@ class AnalyzerAgentPlugin {
         this.possibleCMSType = '';
         this.possibleCMSVerison = '';
         this.serverRequestTimeMap = this.resultadoJson.serverRequestTimeMap;
-
 		logger.info('init plugin', { launchOptions });
 	}
 
@@ -65,31 +64,34 @@ class AnalyzerAgentPlugin {
         registerAction('afterResponse', ({response}) => {
             const url = response.url
             var serverProcessingTime = 0
-            if(response.timings.secureConnect !== undefined){
-                const excludeUpload = response.timings.upload - response.timings.secureConnect
-                serverProcessingTime = (response.timings.response - response.timings.secureConnect) - excludeUpload;
-            }else{
-                const excludeUpload = response.timings.upload - response.timings.connect
-                serverProcessingTime = response.timings.response - response.timings.connect;
+            if(this.serverRequestTimeMap[url] === undefined || this.resultadoJson.run > this.serverRequestTimeMap[url].length){
+                if(response.timings.secureConnect !== undefined){
+                    const excludeUpload = response.timings.upload - response.timings.secureConnect
+                    serverProcessingTime = (response.timings.response - response.timings.secureConnect) - excludeUpload;
+                }else{
+                    const excludeUpload = response.timings.upload - response.timings.connect
+                    serverProcessingTime = response.timings.response - response.timings.connect;
+                }
+                if(this.serverRequestTimeMap[url] !== undefined){
+                    this.serverRequestTimeMap[url].push({ 
+                        serverProcessingTime: serverProcessingTime,
+                        timings: this.all_times ? response.timings : null
+                    });
+                }else{
+                    this.serverRequestTimeMap[url] = [];
+                    this.serverRequestTimeMap[url].push({ 
+                        serverProcessingTime: serverProcessingTime,
+                        timings: this.all_times ? response.timings : null
+                    });
+                }
+                logger.info('Gravando tempo de resposta:', { url });
+                logger.info('O tempo de resposta do servidor foi:', { serverProcessingTime });
             }
-            if(this.serverRequestTimeMap[url] !== undefined){
-                this.serverRequestTimeMap[url].push({ 
-                    serverProcessingTime: serverProcessingTime,
-                    timings: this.all_times ? response.timings : null
-                });
-            }else{
-                this.serverRequestTimeMap[url] = [];
-                this.serverRequestTimeMap[url].push({ 
-                    serverProcessingTime: serverProcessingTime,
-                    timings: this.all_times ? response.timings : null
-                });
-            }
-            logger.info('Gravando tempo de resposta:', { url });
-            logger.info('O tempo de resposta do servidor foi:', { serverProcessingTime });
             return response;
         });
         registerAction('afterFinish', async () => {
             this.resultadoJson.possibleCMS = this.possibleCMS;
+            this.resultadoJson.run = this.resultadoJson.run + 1;
             this.resultadoJson.possibleCMSType = this.possibleCMSType;
             this.resultadoJson.serverRequestTimeMap = this.serverRequestTimeMap;
             //console.log(this.resultadoJson);

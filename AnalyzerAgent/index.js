@@ -44,7 +44,8 @@ if(process.argv.length > 3){
 var out_cli = {
   possibleCMS: false,
   possibleCMSType: '',
-  serverRequestTimeMap: {}
+  serverRequestTimeMap: {},
+  run: 1
 };
 
 const jsonString = JSON.stringify(out_cli);
