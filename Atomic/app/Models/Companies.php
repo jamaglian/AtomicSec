@@ -20,6 +20,14 @@ class Companies extends Model
         'name'
     ];
 
+    /**
+     * Get the applications associated with the company.
+     */
+    public function applications()
+    {
+        return $this->hasMany(Applications::class, 'company_id');
+    }
+
     public function owner()
     {
         return $this->belongsTo(User::class, 'company_owner_id');

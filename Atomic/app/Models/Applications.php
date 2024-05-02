@@ -20,6 +20,5 @@ class Applications extends Model
         'name',
         'type',
         'analysis'
-
     ];
 }
