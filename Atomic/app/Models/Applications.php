@@ -18,6 +18,7 @@ class Applications extends Model
     protected $fillable = [
         'company_id',
         'name',
+        'url',
         'type',
         'analysis'
     ];
