@@ -6,6 +6,8 @@ var url_scrape = '';
 var ignoreCss = true;
 var ignoreJs = true;
 var ignoreImages = true;
+var ignoreFontFiles = true;
+var ignoreVideoFiles = true;
 var all_times = false;
 const regex = /^(?:https?|ftp):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?$/;
 
@@ -32,6 +34,12 @@ if(process.argv.length > 3){
       }
       if(depois.indexOf("img") !== -1){
         ignoreImages = false;
+      }
+      if(depois.indexOf("font") !== -1){
+        ignoreFontFiles = false;
+      }
+      if(depois.indexOf("vide") !== -1){
+        ignoreVideoFiles = false;
       }
     }
     const startIndexAllTimes = element.indexOf("-all_times");
@@ -70,6 +78,8 @@ const options = {
       ignoreCss: ignoreCss,
       ignoreJs: ignoreJs,
       ignoreImages: ignoreImages,
+      ignoreFontFiles: ignoreFontFiles,
+      ignoreVideoFiles: ignoreVideoFiles,
       all_times: all_times
     })
   ]

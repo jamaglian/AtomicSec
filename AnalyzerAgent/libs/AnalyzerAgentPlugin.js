@@ -23,12 +23,16 @@ class AnalyzerAgentPlugin {
         ignoreCss = true,
         ignoreJs = true,
         ignoreImages = true,
+        ignoreFontFiles = true,
+        ignoreVideoFiles = true,
         all_times = false
 	} = {}) {
 		this.launchOptions = launchOptions;
         this.ignoreCss = ignoreCss;
         this.ignoreJs = ignoreJs;
         this.ignoreImages = ignoreImages;
+        this.ignoreFontFiles = ignoreFontFiles;
+        this.ignoreVideoFiles = ignoreVideoFiles;
         this.all_times = all_times;
         this.possibleCMS = false;
         this.resultadoPath = 'resultado.json';
@@ -48,6 +52,12 @@ class AnalyzerAgentPlugin {
                 return Promise.reject(new Error('Solicitação cancelada'));
             }else if (this.ignoreJs && uri.endsWith(".js")){
                 logger.info('Ignorando js:', { uri });
+                return Promise.reject(new Error('Solicitação cancelada'));
+            }else if (this.ignoreFontFiles && (uri.endsWith(".eot") || uri.endsWith(".ttf") || uri.endsWith(".woff2") || uri.endsWith(".woff"))){
+                logger.info('Ignorando font:', { uri });
+                return Promise.reject(new Error('Solicitação cancelada'));
+            }else if (this.ignoreVideoFiles && uri.endsWith(".mp4")){
+                logger.info('Ignorando video:', { uri });
                 return Promise.reject(new Error('Solicitação cancelada'));
             }else if (this.ignoreImages){
                 for (const extension of img_extensions) {
