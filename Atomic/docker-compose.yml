@@ -21,6 +21,7 @@ services:
             - '.:/var/www/html'
             - '/var/run/docker.sock:/var/run/docker.sock'
             - '/usr/bin/docker:/usr/bin/docker'
+            - '/usr/bin/com.docker.cli:/usr/bin/com.docker.cli'
         networks:
             - sail
         depends_on:
