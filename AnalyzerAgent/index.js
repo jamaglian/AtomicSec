@@ -57,7 +57,7 @@ var out_cli = {
 };
 
 const jsonString = JSON.stringify(out_cli);
-const filePath = 'resultado.json';
+const filePath = './result/resultado.json';
 fs.writeFileSync(filePath, jsonString);
 
 const options = {

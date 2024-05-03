@@ -16,10 +16,10 @@ return new class extends Migration
             $table->foreignId('company_id')->unsigned();
             $table->foreign('company_id')->references('id')->on('companies');
             $table->string('name');
-            $table->string('url')->default('undefined');
-            $table->string('type')->default('undefined');
-            $table->json('analysis')->nullable();
-            $table->timestamps();
+            $table->string('url');
+            $table->string('type')->default('Não definido');
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
         });
     }
 

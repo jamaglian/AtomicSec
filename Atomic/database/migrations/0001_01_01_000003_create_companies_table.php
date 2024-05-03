@@ -16,7 +16,8 @@ return new class extends Migration
             $table->foreignId('company_owner_id')->unsigned();
             $table->foreign('company_owner_id')->references('id')->on('users');
             $table->string('name')->unique();
-            $table->timestamps();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
         });
     }
 

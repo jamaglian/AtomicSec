@@ -19,7 +19,8 @@ return new class extends Migration
             $table->string('password');
             $table->boolean('global_admin')->default(0);
             $table->rememberToken();
-            $table->timestamps();
+            $table->timestamp('created_at')->useCurrent();
+            $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

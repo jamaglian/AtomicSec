@@ -35,7 +35,7 @@ class AnalyzerAgentPlugin {
         this.ignoreVideoFiles = ignoreVideoFiles;
         this.all_times = all_times;
         this.possibleCMS = false;
-        this.resultadoPath = 'resultado.json';
+        this.resultadoPath = './result/resultado.json';
         this.resultadoJson = JSON.parse(fs.readFileSync(this.resultadoPath, 'utf8'));
         this.possibleCMSType = '';
         this.possibleCMSVerison = '';
@@ -95,6 +95,7 @@ class AnalyzerAgentPlugin {
                         timings: this.all_times ? response.timings : null
                     });
                 }
+                console.log("O tempo para o primeiro byte da url " + url + " foi de " + serverProcessingTime);
                 logger.info('Gravando tempo de resposta:', { url });
                 logger.info('O tempo de resposta do servidor foi:', { serverProcessingTime });
             }
@@ -126,10 +127,11 @@ class AnalyzerAgentPlugin {
                 }
             });
 
-            console.log("Top 3 maiores valores:");
+            console.log("\nTop 3 maiores valores:");
             topValores.forEach(item => {
                 console.log(`URL: ${item.url}, Valor: ${item.valor}`);
             });
+            console.log("\n\n");
             //console.log(this.resultadoJson);
             const novoJsonString = JSON.stringify(this.resultadoJson, null, 2); // O terceiro argumento é para formatar a saída
             fs.writeFileSync(this.resultadoPath, novoJsonString);
