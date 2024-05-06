@@ -25,6 +25,7 @@ class AnalyzerAgentPlugin {
         ignoreImages = true,
         ignoreFontFiles = true,
         ignoreVideoFiles = true,
+        result_filename = 'resultado.json',
         all_times = false
 	} = {}) {
 		this.launchOptions = launchOptions;
@@ -33,9 +34,10 @@ class AnalyzerAgentPlugin {
         this.ignoreImages = ignoreImages;
         this.ignoreFontFiles = ignoreFontFiles;
         this.ignoreVideoFiles = ignoreVideoFiles;
+        this.result_filename = result_filename;
         this.all_times = all_times;
         this.possibleCMS = false;
-        this.resultadoPath = './result/resultado.json';
+        this.resultadoPath = './result/' + result_filename;
         this.resultadoJson = JSON.parse(fs.readFileSync(this.resultadoPath, 'utf8'));
         this.possibleCMSType = '';
         this.possibleCMSVerison = '';

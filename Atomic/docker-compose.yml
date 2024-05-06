@@ -22,6 +22,7 @@ services:
             - '/var/run/docker.sock:/var/run/docker.sock'
             - '/usr/bin/docker:/usr/bin/docker'
             - '/usr/bin/com.docker.cli:/usr/bin/com.docker.cli'
+            - 'shared_vol:/shared'
         networks:
             - sail
         depends_on:
@@ -89,5 +90,6 @@ networks:
               - subnet: "172.21.0.0/16"
                 gateway: "172.21.0.1"
 volumes:
+    shared_vol:
     sail-mysql:
         driver: local

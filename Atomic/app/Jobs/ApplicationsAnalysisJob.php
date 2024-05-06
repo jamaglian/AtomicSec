@@ -24,6 +24,14 @@ class ApplicationsAnalysisJob implements ShouldQueue, ShouldBeUnique
         $this->applicationsAnalysis = $applicationsAnalysis;
     }
 
+    private function getDomain($url){
+        $pieces = parse_url($url);
+        $domain = isset($pieces['host']) ? $pieces['host'] : '';
+        if(preg_match('/(?P<domain>[a-z0-9][a-z0-9\-]{1,63}\.[a-z\.]{2,6})$/i', $domain, $regs)){
+            return $regs['domain'];
+        }
+        return FALSE;
+    }
     /**
      * Execute the job.
      */
@@ -33,8 +41,7 @@ class ApplicationsAnalysisJob implements ShouldQueue, ShouldBeUnique
         $this->applicationsAnalysis->status = 'Rodando...';
         $this->applicationsAnalysis->save(); // Save log in real-time
         // Command to start Docker container
-        $dockerCommand = "docker run -it -v /var/www/html/storage/app/public:/home/node/app/result --rm analyzeragent node index.js {$this->applicationsAnalysis->application->url}";
-
+        $dockerCommand = "docker run -it -v atomic_shared_vol:/home/node/app/result --rm analyzeragent node index.js {$this->applicationsAnalysis->application->url} --result_filename=". str_replace('.', '_', $this->getDomain($this->applicationsAnalysis->application->url));
         // Open a pipe to the Docker process
         $process = proc_open($dockerCommand, [1 => ['pipe', 'w']], $pipes);
 
@@ -49,11 +56,49 @@ class ApplicationsAnalysisJob implements ShouldQueue, ShouldBeUnique
 
             // Close the process and pipes
             fclose($pipes[1]);
-            proc_close($process);
+            $status = proc_close($process);
 
-            $this->applicationsAnalysis->finish_at = now();
-            $this->applicationsAnalysis->status = 'Finalizada.';
-            $this->applicationsAnalysis->save(); // Save log in real-time
+            if ($status !== 0) {
+                // Se o status de saída indicar um erro, falhe o job
+                $this->applicationsAnalysis->status = 'Erro.';
+                $this->applicationsAnalysis->save(); // Save log in real-time
+                $this->fail('O comando Docker falhou com o status de saída: ' . $status);
+            } else {
+                // Se não houver erros, atualize as informações de finalização e status
+                $filePath = '/shared/' . str_replace('.', '_', $this->getDomain($this->applicationsAnalysis->application->url)) . '.json';
+                // Verifica se o arquivo existe
+                if (file_exists($filePath)) {
+                    // Lê o conteúdo do arquivo JSON
+                    $jsonContent = file_get_contents($filePath);
+
+                    // Faz o parsing do JSON para um array associativo
+                    $jsonData = json_decode($jsonContent, true);
+                     // Verifica se o parsing foi bem-sucedido
+                    if ($jsonData !== null) {
+
+                        // Ou, se já tiver um modelo existente
+                        /*
+                        $modelo = SeuModelo::find($id);
+                        $modelo->coluna_json = $jsonData;
+                        $modelo->save();
+                        */
+                        $this->applicationsAnalysis->analysis = $jsonData;
+                        $this->applicationsAnalysis->finish_at = now();
+                        $this->applicationsAnalysis->status = 'Finalizada.';
+                        $this->applicationsAnalysis->save(); // Save log in real-time
+                        unlink($filePath);
+                    } else {
+                        $this->applicationsAnalysis->status = 'Erro.';
+                        $this->applicationsAnalysis->save(); // Save log in real-time
+                        $this->fail('Erro ao fazer o parsing do JSON.');  
+                    }
+                }else{
+                    $this->applicationsAnalysis->status = 'Erro.';
+                    $this->applicationsAnalysis->save(); // Save log in real-time
+                    $this->fail('O arquivo de resultado não foi encontrado.');  
+                }
+                
+            }
         }
     }
 }

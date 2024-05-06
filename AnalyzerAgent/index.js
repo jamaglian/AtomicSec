@@ -3,6 +3,7 @@ import scrape from 'website-scraper'; // only as ESM, no CommonJS
 import AnalyzerAgentPlugin from './libs/AnalyzerAgentPlugin.js'; // only as ESM, no CommonJS
 
 var url_scrape = '';
+var result_filename = 'resultado.json';
 var ignoreCss = true;
 var ignoreJs = true;
 var ignoreImages = true;
@@ -23,6 +24,11 @@ url_scrape = process.argv[2]
 
 if(process.argv.length > 3){
   process.argv.forEach(element => {
+    const startIndexIncludeCustomResultFile = element.indexOf("--result_filename=");
+    if(startIndexIncludeCustomResultFile !== -1){
+      var result = element.substring(startIndexIncludeCustomResultFile + "--result_filename=".length);
+      result_filename = result + ".json";
+    }
     const startIndexIncludeAsset = element.indexOf("-includeAsset=");
     if(startIndexIncludeAsset !== -1){
       const depois = element.slice(startIndexIncludeAsset + "-includeAsset=".length);
@@ -57,7 +63,7 @@ var out_cli = {
 };
 
 const jsonString = JSON.stringify(out_cli);
-const filePath = './result/resultado.json';
+const filePath = './result/' + result_filename;
 fs.writeFileSync(filePath, jsonString);
 
 const options = {
@@ -80,6 +86,7 @@ const options = {
       ignoreImages: ignoreImages,
       ignoreFontFiles: ignoreFontFiles,
       ignoreVideoFiles: ignoreVideoFiles,
+      result_filename: result_filename,
       all_times: all_times
     })
   ]
