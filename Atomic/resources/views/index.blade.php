@@ -19,14 +19,14 @@
                             href="{{ url('/dashboard') }}"
                             class="dash"
                         >
-                            Dashboard
+                            {{__("Dashboard")}}
                         </a>
                     @else
                         <a
                             href="{{ route('login') }}"
                             class="login"
                         >
-                            Log in
+                        {{__("Log in")}}
                         </a>
 
                         @if (Route::has('register'))
@@ -34,7 +34,7 @@
                                 href="{{ route('register') }}"
                                 class="reg"
                             >
-                                Register
+                            {{__("Register")}}
                             </a>
                         @endif
                     @endauth

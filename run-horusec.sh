@@ -1,2 +1,2 @@
-docker run -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/src/horusec-vscode --name horusec-cli horuszup/horusec-cli:latest horusec start -p /src/horusec-vscode -P $(pwd) -o json -O /src/horusec-vscode/horusec-result.json --config-file-path /src/horusec-vscode/horusec-config.json -I true -D true 
+docker run -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/src/horusec-vscode --name horusec-cli horuszup/horusec-cli:latest horusec start -p /src/horusec-vscode -P $(pwd) -o json -O /src/horusec-vscode/horusec-result.json --log-file-path /src/horusec-vscode/horusec.log --config-file-path /src/horusec-vscode/horusec-config.json -D true
 docker rm horusec-cli -f

@@ -6,30 +6,27 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Companies extends Model
+class ApplicationsAnalysis extends Model
 {
     use HasFactory, Notifiable;
-
+    protected $table = 'applications_analysis';
     /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
      */
     protected $fillable = [
-        'company_owner_id',
-        'name'
+        'application_id',
+        'analysis',
+        'log',
+        'created_at',
+        'updated_at'
     ];
-
     /**
-     * Get the applications associated with the company.
+     * Get the application associated with the analysis.
      */
-    public function applications()
+    public function application()
     {
-        return $this->hasMany(Applications::class, 'company_id');
-    }
-
-    public function owner()
-    {
-        return $this->belongsTo(User::class, 'company_owner_id');
+        return $this->hasOne(Applications::class, 'id', 'application_id');
     }
 }

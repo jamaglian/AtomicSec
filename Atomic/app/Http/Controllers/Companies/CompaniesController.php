@@ -15,7 +15,10 @@ use Illuminate\Support\Facades\Redirect;
 class CompaniesController extends Controller
 {
     /**
-     * Mostra a página de empresas para o global admin.
+     * Exibe a página de visualização de empresas para o administrador global.
+     *
+     * @param Request $request A requisição HTTP recebida.
+     * @return View Uma resposta de visualização contendo os dados das empresas.
      */
     public function view_gadmin(Request $request): View
     {
@@ -26,7 +29,10 @@ class CompaniesController extends Controller
     }
 
     /**
-     * Mostra a página de criação de empresas para o global admin.
+     * Exibe a página de criação de empresas para o administrador global.
+     *
+     * @param Request $request A requisição HTTP recebida.
+     * @return View Uma resposta de visualização para o formulário de cadastro de empresas.
      */
     public function cadastrof_gadmin(Request $request): View
     {
@@ -34,7 +40,10 @@ class CompaniesController extends Controller
     }
 
     /**
-     * Mostra a página de criação de empresas para o global admin.
+     * Exibe a página de criação de empresas para o administrador global.
+     *
+     * @param Request $request A requisição HTTP recebida.
+     * @return RedirectResponse Uma resposta de redirecionamento, se aplicável.
      */
     public function cadastro_gadmin(Request $request): RedirectResponse
     {

@@ -18,8 +18,21 @@ class Applications extends Model
     protected $fillable = [
         'company_id',
         'name',
-        'type',
-        'analysis'
-
+        'url',
+        'type'
     ];
+    /**
+     * Get the companies associated with the application.
+     */
+    public function company()
+    {
+        return $this->hasOne(Companies::class, 'id', 'company_id');
+    }
+    /**
+     * Get the analysis associated with the application.
+     */
+    public function analysis()
+    {
+        return $this->hasMany(ApplicationsAnalysis::class, 'application_id');
+    }
 }

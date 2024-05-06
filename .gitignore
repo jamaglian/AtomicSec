@@ -1,1 +1,5 @@
 *.DS_Store
+*node_modules
+*resultado.json
+horusec-result.json
+horusec.log

@@ -28,6 +28,11 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        $user = Auth::user();
+        if(!$user->isGlobalAdmin() && isset($user->companies[0])){
+            $request->session()->put('company', $user->companies[0]->id);
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
