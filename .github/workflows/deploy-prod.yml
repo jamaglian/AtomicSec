@@ -21,48 +21,82 @@ jobs:
     
     - name: Setup SSH Connection
       env:
-        SSH_USER:  ${{ secrets.SERVER_USER }}
-        SSH_KEY:   ${{ secrets.SERVER_KEY }}
-        SSH_HOSTS: ${{ secrets.SERVER_HOST }}
+        SSH_USER: ${{ secrets.SERVER_USER }}
+        SSH_KEY: ${{ secrets.SERVER_KEY }}
+        SSH_HOST: ${{ secrets.SERVER_HOST }}
+        SSH_PORT: ${{ secrets.SSH_PORT }}
       run: |
-        mkdir -p ~/.ssh
+        mkdir -p ~/.ssh/
         echo "$SSH_KEY" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
-        cat >> ~/.ssh/config <<END
+        cat >>~/.ssh/config <<END
         Host producao-host
-          HostName $SSH_HOSTS
+          HostName $SSH_HOST
           User $SSH_USER
+          Port $SSH_PORT
           IdentityFile ~/.ssh/id_rsa
           StrictHostKeyChecking no
-        END	
+        END
 
     - name: Limpando Servidor
       if: ${{ github.event.inputs.fresh-deploy == 'true' }}
       continue-on-error: true
       env:
+        DB_USER: ${{ secrets.SERVER_USER }}
         DB_PASS: ${{ secrets.DB_PASS }}
       run: |
-        ssh producao-host "rm -rf /var/www/atomic.sec/producao/*"
-        ssh producao-host "mysql -u atomic.sec -p$DB_PASS -e 'DROP DATABASE producao; CREATE DATABASE producao;'"
-
-    - name: Copy files to server
+        ssh producao-host "sudo rm -rf /var/www/atomic.sec/producao/*"
+        ssh producao-host "mysql -u $DB_USER -p$DB_PASS -e 'DROP DATABASE producao; CREATE DATABASE producao;'"
+    - name: Build Assets
       run: |
-        rsync -vz 
-              --delete 
-              --inplace
-              --no-perms
-              --recursive
-              --whole-file
-              --exclude='.git' 
-              --exclude='.github' 
-              --exclude='node_modules' 
-              --exclude='vendor' 
-              --exclude='storage' 
-              --include='public/.htaccess'
-              --include='public/favicon.ico'
-              --include='public/index.php'
-              --include='public/images'
-              --exclude='public/*'
-              --exclude='.env'
+        cd /home/runner/work/AtomicSec/AtomicSec/Atomic/
+        npm install
+        npm run build
+        cd /home/runner/work/AtomicSec/AtomicSec/
+    - name: Web platform sync files
+      run: |
+        rsync -z \
+              --delete \
+              --inplace \
+              --no-perms \
+              --recursive \
+              --whole-file \
+              --exclude='.git' \
+              --exclude='.github' \
+              --exclude='node_modules' \
+              --exclude='vendor' \
+              --include='storage/framework' \
+              --exclude='storage/*' \
+              --include='public/.htaccess' \
+              --include='public/favicon.ico' \
+              --include='public/index.php' \
+              --include='public/images' \
+              --include='public/build' \
+              --exclude='public/*' \
+              --exclude='.env' \
               /home/runner/work/AtomicSec/AtomicSec/Atomic/ producao-host:/var/www/atomic.sec/producao/
 
+    - name: Setup web platform
+      env:
+        SSH_USER: ${{ secrets.SERVER_USER }}
+        ENV_PRODUCAO: ${{ secrets.ENV_PRODUCAO }}
+      run: |
+        #Setup .env
+        echo "$ENV_PRODUCAO" > env_producao
+        scp ./env_producao producao-host:/var/www/atomic.sec/producao/.env
+        rm ./env_producao
+        #Install composer dependencies
+        ssh producao-host "cd /var/www/atomic.sec/producao/ && composer install --no-dev --optimize-autoloader"
+        #set permissions
+        ssh producao-host "sudo chown www-data:www-data -R /var/www/atomic.sec/producao/"
+        ssh producao-host "sudo chmod 775 -R /var/www/atomic.sec/producao/"
+
+    - name: Setup again
+      if: ${{ github.event.inputs.fresh-deploy == 'true' }}
+      run: |
+        ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan migrate --force"
+        ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan config:cache"
+        ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan route:cache"
+        ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan view:cache"
+        ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan storage:link"
+        ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan queue:restart"
