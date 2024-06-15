@@ -45,7 +45,7 @@ jobs:
         DB_USER: ${{ secrets.SERVER_USER }}
         DB_PASS: ${{ secrets.DB_PASS }}
       run: |
-        ssh producao-host "rm -rf /var/www/atomic.sec/producao/*"
+        ssh producao-host "sudo rm -rf /var/www/atomic.sec/producao/*"
         ssh producao-host "mysql -u $DB_USER -p$DB_PASS -e 'DROP DATABASE producao; CREATE DATABASE producao;'"
     - name: Build Assets
       run: |
