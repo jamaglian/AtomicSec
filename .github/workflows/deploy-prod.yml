@@ -26,7 +26,7 @@ jobs:
         SSH_HOST: ${{ secrets.SERVER_HOST }}
         SSH_PORT: ${{ secrets.SSH_PORT }}
       run: |
-        mkdir -p ~/.ssh
+        mkdir -p ~/.ssh/
         echo "$SSH_KEY" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         cat >>~/.ssh/config <<END
@@ -37,6 +37,7 @@ jobs:
           IdentityFile ~/.ssh/id_rsa
           StrictHostKeyChecking no
         END
+
     - name: Limpando Servidor
       if: ${{ github.event.inputs.fresh-deploy == 'true' }}
       continue-on-error: true
@@ -44,6 +45,7 @@ jobs:
         DB_USER: ${{ secrets.SERVER_USER }}
         DB_PASS: ${{ secrets.DB_PASS }}
       run: |
+        cat ~/.ssh/config
         ssh producao-host "rm -rf /var/www/atomic.sec/producao/*"
         ssh producao-host "mysql -u $DB_USER -p$DB_PASS -e 'DROP DATABASE producao; CREATE DATABASE producao;'"
 
