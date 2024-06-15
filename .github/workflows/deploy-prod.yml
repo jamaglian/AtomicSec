@@ -24,6 +24,7 @@ jobs:
         SSH_USER:  ${{ secrets.SERVER_USER }}
         SSH_KEY:   ${{ secrets.SERVER_KEY }}
         SSH_HOSTS: ${{ secrets.SERVER_HOST }}
+        SSH_PORT:  ${{ secrets.SSH_PORT }}
       run: |
         mkdir -p ~/.ssh
         echo "$SSH_KEY" > ~/.ssh/id_rsa
@@ -32,6 +33,7 @@ jobs:
         Host producao-host
           HostName $SSH_HOSTS
           User $SSH_USER
+          Port $SSH_PORT
           IdentityFile ~/.ssh/id_rsa
           StrictHostKeyChecking no
         END	
@@ -49,8 +51,10 @@ jobs:
       env:
         SSH_USER:  ${{ secrets.SERVER_USER }}
         SSH_HOSTS: ${{ secrets.SERVER_HOST }}
+        SSH_PORT:  ${{ secrets.SSH_PORT }}
       run: |
-        rsync -vz \
+        rsync -e 'ssh -p $SSH_PORT -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa' \
+              -vz \
               --delete \
               --inplace \
               --no-perms \
