@@ -29,13 +29,14 @@ jobs:
         mkdir -p ~/.ssh
         echo "$SSH_KEY" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
-        cat >> ~/.ssh/config <<END
+        cat >>~/.ssh/config <<END
         Host producao-host
           HostName $SSH_HOST
           User $SSH_USER
           Port $SSH_PORT
           IdentityFile ~/.ssh/id_rsa
           StrictHostKeyChecking no
+        END
     - name: Limpando Servidor
       if: ${{ github.event.inputs.fresh-deploy == 'true' }}
       continue-on-error: true
