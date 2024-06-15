@@ -45,7 +45,6 @@ jobs:
         DB_USER: ${{ secrets.SERVER_USER }}
         DB_PASS: ${{ secrets.DB_PASS }}
       run: |
-        cat ~/.ssh/config
         ssh producao-host "rm -rf /var/www/atomic.sec/producao/*"
         ssh producao-host "mysql -u $DB_USER -p$DB_PASS -e 'DROP DATABASE producao; CREATE DATABASE producao;'"
     - name: Build Assets
@@ -82,7 +81,7 @@ jobs:
       run: |
         #Install composer dependencies
         ssh producao-host "cd /var/www/atomic.sec/producao/ && composer install --no-dev --optimize-autoloader"
-        echo $ENV_PRODUCAO | base64 --decode > env_producao
+        echo "$ENV_PRODUCAO" > env_producao
         scp ./env_producao producao-host:/var/www/atomic.sec/producao/.env
         rm ./env_producao
 
