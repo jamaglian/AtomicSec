@@ -26,14 +26,15 @@ return new class extends Migration
             $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
         });
 
-        User::factory()->create([
+        User::create([
             'name' => 'Admin',
             'email' => 'admin@atomicsec.com.br',
             'email_verified_at' => now(),
             'password' => Hash::make('12345678'),
             'remember_token' => Str::random(10),
+            'global_admin' => 1,
         ]);
-        
+
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');
