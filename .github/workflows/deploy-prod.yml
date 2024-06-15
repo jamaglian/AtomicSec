@@ -46,8 +46,12 @@ jobs:
         ssh producao-host "mysql -u atomic.sec -p$DB_PASS -e 'DROP DATABASE producao; CREATE DATABASE producao;'"
 
     - name: Copy files to server
+      env:
+        SSH_USER:  ${{ secrets.SERVER_USER }}
+        SSH_HOSTS: ${{ secrets.SERVER_HOST }}
       run: |
-        rsync -vz 
+        rsync -e 'ssh -o StrictHostKeyChecking=no'
+              -vz 
               --delete 
               --inplace
               --no-perms
@@ -64,5 +68,5 @@ jobs:
               --include='public/images'
               --exclude='public/*'
               --exclude='.env'
-              /home/runner/work/AtomicSec/AtomicSec/Atomic/ producao-host:/var/www/atomic.sec/producao/
+              /home/runner/work/AtomicSec/AtomicSec/Atomic/ $SSH_USER@$SSH_HOSTS:/var/www/atomic.sec/producao/
 
