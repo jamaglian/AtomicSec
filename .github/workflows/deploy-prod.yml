@@ -50,9 +50,8 @@ jobs:
         SSH_USER:  ${{ secrets.SERVER_USER }}
         SSH_HOSTS: ${{ secrets.SERVER_HOST }}
       run: |
-        ls
-        pwd
-        rsync -vz \
+        rsync -e 'ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa' \
+              -vz \
               --delete \
               --inplace \
               --no-perms \
@@ -69,5 +68,5 @@ jobs:
               --include='public/images' \
               --exclude='public/*' \
               --exclude='.env' \
-              /home/runner/work/AtomicSec/AtomicSec/Atomic/ producao-host:/var/www/atomic.sec/producao/
+              /home/runner/work/AtomicSec/AtomicSec/Atomic/ $SSH_USER@$SSH_HOSTS:/var/www/atomic.sec/producao/
 
