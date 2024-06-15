@@ -82,7 +82,7 @@ jobs:
       run: |
         #Install composer dependencies
         ssh producao-host "cd /var/www/atomic.sec/producao/ && composer install --no-dev --optimize-autoloader"
-        cat "$ENV_PRODUCAO" > env_producao
+        echo $ENV_PRODUCAO | base64 --decode > env_producao
         scp ./env_producao producao-host:/var/www/atomic.sec/producao/.env
         rm ./env_producao
 
