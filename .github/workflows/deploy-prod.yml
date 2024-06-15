@@ -59,9 +59,9 @@ jobs:
               --no-perms \
               --recursive \
               --whole-file \
-              --exclude='.git' \ 
-              --exclude='.github' \ 
-              --exclude='node_modules' \ 
+              --exclude='.git' \
+              --exclude='.github' \
+              --exclude='node_modules' \
               --exclude='vendor' \
               --exclude='storage' \
               --include='public/.htaccess' \
@@ -70,5 +70,5 @@ jobs:
               --include='public/images' \
               --exclude='public/*' \
               --exclude='.env' \
-              ./Atomic $SSH_USER@$SSH_HOSTS:/var/www/atomic.sec/producao/ \
+              /home/runner/work/AtomicSec/AtomicSec/Atomic/ $SSH_USER@$SSH_HOSTS:/var/www/atomic.sec/producao/
 
