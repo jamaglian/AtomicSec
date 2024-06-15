@@ -53,8 +53,7 @@ jobs:
         SSH_HOST: ${{ secrets.SERVER_HOST }}
         SSH_PORT: ${{ secrets.SSH_PORT }}
       run: |
-        rsync -e 'ssh -p $SSH_PORT -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa' \
-              -vz \
+        rsync -vz \
               --delete \
               --inplace \
               --no-perms \
@@ -71,5 +70,5 @@ jobs:
               --include='public/images' \
               --exclude='public/*' \
               --exclude='.env' \
-              /home/runner/work/AtomicSec/AtomicSec/Atomic/ $SSH_USER@$SSH_HOST:/var/www/atomic.sec/producao/
+              /home/runner/work/AtomicSec/AtomicSec/Atomic/ producao-host:/var/www/atomic.sec/producao/
 
