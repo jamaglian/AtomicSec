@@ -50,6 +50,9 @@ jobs:
         SSH_USER:  ${{ secrets.SERVER_USER }}
         SSH_HOSTS: ${{ secrets.SERVER_HOST }}
       run: |
+        ls
+        ls /home/runner/work/AtomicSec/
+        ls /home/runner/work/AtomicSec/AtomicSec/
         rsync -e 'ssh -o StrictHostKeyChecking=no' \
               -vz \
               --delete \
