@@ -91,7 +91,7 @@ jobs:
         ssh producao-host "sudo chown www-data:www-data -R /var/www/atomic.sec/producao/"
         ssh producao-host "sudo chmod 775 -R /var/www/atomic.sec/producao/"
 
-    name: Setup again
+    - name: Setup again
       if: ${{ github.event.inputs.fresh-deploy == 'true' }}
       run: |
         ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan migrate --force"
