@@ -50,23 +50,23 @@ jobs:
         SSH_USER:  ${{ secrets.SERVER_USER }}
         SSH_HOSTS: ${{ secrets.SERVER_HOST }}
       run: |
-        rsync -e 'ssh -o StrictHostKeyChecking=no'
-              -vz 
-              --delete 
-              --inplace
-              --no-perms
-              --recursive
-              --whole-file
-              --exclude='.git' 
-              --exclude='.github' 
-              --exclude='node_modules' 
-              --exclude='vendor' 
-              --exclude='storage' 
-              --include='public/.htaccess'
-              --include='public/favicon.ico'
-              --include='public/index.php'
-              --include='public/images'
-              --exclude='public/*'
-              --exclude='.env'
-              /home/runner/work/AtomicSec/AtomicSec/Atomic/ $SSH_USER@$SSH_HOSTS:/var/www/atomic.sec/producao/
+        rsync -e 'ssh -o StrictHostKeyChecking=no' \
+              -vz \
+              --delete \
+              --inplace \
+              --no-perms \
+              --recursive \
+              --whole-file \
+              --exclude='.git' \ 
+              --exclude='.github' \ 
+              --exclude='node_modules' \ 
+              --exclude='vendor' \
+              --exclude='storage' \
+              --include='public/.htaccess' \
+              --include='public/favicon.ico' \
+              --include='public/index.php' \
+              --include='public/images' \
+              --exclude='public/*' \
+              --exclude='.env' \
+              /home/runner/work/AtomicSec/AtomicSec/Atomic/ $SSH_USER@$SSH_HOSTS:/var/www/atomic.sec/producao/ \
 
