@@ -86,6 +86,6 @@ jobs:
         scp ./env_producao producao-host:/var/www/atomic.sec/producao/.env
         rm ./env_producao
         #set permissions
-        ssh producao-host "chown :www-data -R /var/www/atomic.sec/producao/"
+        ssh producao-host "chown www-data:www-data -R /var/www/atomic.sec/producao/"
         ssh producao-host "chmod 775 -R /var/www/atomic.sec/producao/"
 
