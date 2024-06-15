@@ -77,7 +77,12 @@ jobs:
               /home/runner/work/AtomicSec/AtomicSec/Atomic/ producao-host:/var/www/atomic.sec/producao/
 
     - name: Setup web platform
+      env:
+        ENV_PRODUCAO: ${{ secrets.ENV_PRODUCAO }}
       run: |
         #Install composer dependencies
         ssh producao-host "cd /var/www/atomic.sec/producao/ && composer install --no-dev --optimize-autoloader"
+        cat "$ENV_PRODUCAO" > env_producao
+        scp ./env_producao producao-host:/var/www/atomic.sec/producao/.env
+        rm ./env_producao
 
