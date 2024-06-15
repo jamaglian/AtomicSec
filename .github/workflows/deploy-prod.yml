@@ -42,10 +42,11 @@ jobs:
       if: ${{ github.event.inputs.fresh-deploy == 'true' }}
       continue-on-error: true
       env:
+        DB_USER: ${{ secrets.SERVER_USER }}
         DB_PASS: ${{ secrets.DB_PASS }}
       run: |
         ssh producao-host "rm -rf /var/www/atomic.sec/producao/*"
-        ssh producao-host "mysql -u atomic.sec -p$DB_PASS -e 'DROP DATABASE producao; CREATE DATABASE producao;'"
+        ssh producao-host "mysql -u $DB_USER -p$DB_PASS -e 'DROP DATABASE producao; CREATE DATABASE producao;'"
 
     - name: Copy files to server
       env:
