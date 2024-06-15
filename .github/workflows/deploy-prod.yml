@@ -51,8 +51,7 @@ jobs:
         SSH_HOSTS: ${{ secrets.SERVER_HOST }}
       run: |
         ls
-        ls /home/runner/work/AtomicSec/
-        ls /home/runner/work/AtomicSec/AtomicSec/
+        pwd
         rsync -e 'ssh -o StrictHostKeyChecking=no' \
               -vz \
               --delete \
