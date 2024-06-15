@@ -50,8 +50,7 @@ jobs:
         SSH_USER:  ${{ secrets.SERVER_USER }}
         SSH_HOSTS: ${{ secrets.SERVER_HOST }}
       run: |
-        rsync -e 'ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa' \
-              -vz \
+        rsync -vz \
               --delete \
               --inplace \
               --no-perms \
