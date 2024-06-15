@@ -48,14 +48,13 @@ jobs:
         cat ~/.ssh/config
         ssh producao-host "rm -rf /var/www/atomic.sec/producao/*"
         ssh producao-host "mysql -u $DB_USER -p$DB_PASS -e 'DROP DATABASE producao; CREATE DATABASE producao;'"
-
-    - name: Copy files to server
-      env:
-        SSH_USER: ${{ secrets.SERVER_USER }}
-        SSH_HOST: ${{ secrets.SERVER_HOST }}
-        SSH_PORT: ${{ secrets.SSH_PORT }}
+    - name: Build Assets
       run: |
-        rsync -vz \
+        npm install
+        npm run build
+    - name: Web platform sync files
+      run: |
+        rsync -z \
               --delete \
               --inplace \
               --no-perms \
@@ -70,7 +69,13 @@ jobs:
               --include='public/favicon.ico' \
               --include='public/index.php' \
               --include='public/images' \
+              --include='public/build' \
               --exclude='public/*' \
               --exclude='.env' \
               /home/runner/work/AtomicSec/AtomicSec/Atomic/ producao-host:/var/www/atomic.sec/producao/
+
+    - name: Setup web platform
+      run: |
+        #Install composer dependencies
+        ssh producao-host "cd /var/www/atomic.sec/producao/ && composer install --no-dev --optimize-autoloader"
 
