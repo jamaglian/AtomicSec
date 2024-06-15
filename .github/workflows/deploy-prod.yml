@@ -36,7 +36,6 @@ jobs:
           Port $SSH_PORT
           IdentityFile ~/.ssh/id_rsa
           StrictHostKeyChecking no
-        END
     - name: Limpando Servidor
       if: ${{ github.event.inputs.fresh-deploy == 'true' }}
       continue-on-error: true
