@@ -52,8 +52,7 @@ jobs:
       run: |
         ls
         pwd
-        rsync -e 'ssh -o StrictHostKeyChecking=no' \
-              -vz \
+        rsync -vz \
               --delete \
               --inplace \
               --no-perms \
@@ -70,5 +69,5 @@ jobs:
               --include='public/images' \
               --exclude='public/*' \
               --exclude='.env' \
-              /home/runner/work/AtomicSec/AtomicSec/Atomic/ $SSH_USER@$SSH_HOSTS:/var/www/atomic.sec/producao/
+              /home/runner/work/AtomicSec/AtomicSec/Atomic/ producao-host:/var/www/atomic.sec/producao/
 
