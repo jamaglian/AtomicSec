@@ -65,9 +65,8 @@ jobs:
               --exclude='.github' \
               --exclude='node_modules' \
               --exclude='vendor' \
-              --exclude='storage/framework/views/*' \
               --include='storage/framework' \
-              --exclude='storage' \
+              --exclude='storage/*' \
               --include='public/.htaccess' \
               --include='public/favicon.ico' \
               --include='public/index.php' \
@@ -92,3 +91,12 @@ jobs:
         ssh producao-host "sudo chown www-data:www-data -R /var/www/atomic.sec/producao/"
         ssh producao-host "sudo chmod 775 -R /var/www/atomic.sec/producao/"
 
+    name: Setup again
+      if: ${{ github.event.inputs.fresh-deploy == 'true' }}
+      run: |
+        ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan migrate --force"
+        ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan config:cache"
+        ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan route:cache"
+        ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan view:cache"
+        ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan storage:link"
+        ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan queue:restart"
