@@ -65,6 +65,8 @@ jobs:
               --exclude='.github' \
               --exclude='node_modules' \
               --exclude='vendor' \
+              --exclude='storage/framework/views/*' \
+              --include='storage/framework' \
               --exclude='storage' \
               --include='public/.htaccess' \
               --include='public/favicon.ico' \
