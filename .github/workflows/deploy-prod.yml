@@ -50,8 +50,10 @@ jobs:
         ssh producao-host "mysql -u $DB_USER -p$DB_PASS -e 'DROP DATABASE producao; CREATE DATABASE producao;'"
     - name: Build Assets
       run: |
+        cd /home/runner/work/AtomicSec/AtomicSec/Atomic/
         npm install
         npm run build
+        cd /home/runner/work/AtomicSec/AtomicSec/
     - name: Web platform sync files
       run: |
         rsync -z \
