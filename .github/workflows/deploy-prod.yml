@@ -45,8 +45,7 @@ jobs:
         DB_USER: ${{ secrets.SERVER_USER }}
         DB_PASS: ${{ secrets.DB_PASS }}
       run: |
-        #ssh producao-host "rm -rf /var/www/atomic.sec/producao/*"
-        ssh producao-host "sh ~/clean_web_producao.sh"
+        ssh producao-host "rm -rf /var/www/atomic.sec/producao/*"
         ssh producao-host "mysql -u $DB_USER -p$DB_PASS -e 'DROP DATABASE producao; CREATE DATABASE producao;'"
     - name: Build Assets
       run: |
@@ -56,8 +55,6 @@ jobs:
         cd /home/runner/work/AtomicSec/AtomicSec/
     - name: Web platform sync files
       run: |
-        #set permissions
-        ssh producao-host "sh ~/set_nginx_owner_producao.sh"
         rsync -z \
               --delete \
               --inplace \
@@ -89,5 +86,6 @@ jobs:
         scp ./env_producao producao-host:/var/www/atomic.sec/producao/.env
         rm ./env_producao
         #set permissions
-        ssh producao-host "sh ~/set_nginx_owner_producao.sh"
+        ssh producao-host "chown :www-data -R /var/www/atomic.sec/producao/"
+        ssh producao-host "chmod 775 -R /var/www/atomic.sec/producao/"
 
