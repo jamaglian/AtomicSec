@@ -70,5 +70,5 @@ jobs:
               --include='public/images' \
               --exclude='public/*' \
               --exclude='.env' \
-              /home/runner/work/AtomicSec/AtomicSec/Atomic/ $SSH_USER@$SSH_HOSTS:/var/www/atomic.sec/producao/ \
+              ./Atomic $SSH_USER@$SSH_HOSTS:/var/www/atomic.sec/producao/ \
 
