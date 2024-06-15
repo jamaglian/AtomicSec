@@ -21,17 +21,17 @@ jobs:
     
     - name: Setup SSH Connection
       env:
-        SSH_USER:  ${{ secrets.SERVER_USER }}
-        SSH_KEY:   ${{ secrets.SERVER_KEY }}
-        SSH_HOSTS: ${{ secrets.SERVER_HOST }}
-        SSH_PORT:  ${{ secrets.SSH_PORT }}
+        SSH_USER: ${{ secrets.SERVER_USER }}
+        SSH_KEY: ${{ secrets.SERVER_KEY }}
+        SSH_HOST: ${{ secrets.SERVER_HOST }}
+        SSH_PORT: ${{ secrets.SSH_PORT }}
       run: |
         mkdir -p ~/.ssh
         echo "$SSH_KEY" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         cat >> ~/.ssh/config <<END
         Host producao-host
-          HostName $SSH_HOSTS
+          HostName $SSH_HOST
           User $SSH_USER
           Port $SSH_PORT
           IdentityFile ~/.ssh/id_rsa
@@ -49,9 +49,9 @@ jobs:
 
     - name: Copy files to server
       env:
-        SSH_USER:  ${{ secrets.SERVER_USER }}
-        SSH_HOSTS: ${{ secrets.SERVER_HOST }}
-        SSH_PORT:  ${{ secrets.SSH_PORT }}
+        SSH_USER: ${{ secrets.SERVER_USER }}
+        SSH_HOST: ${{ secrets.SERVER_HOST }}
+        SSH_PORT: ${{ secrets.SSH_PORT }}
       run: |
         rsync -e 'ssh -p $SSH_PORT -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa' \
               -vz \
@@ -71,5 +71,5 @@ jobs:
               --include='public/images' \
               --exclude='public/*' \
               --exclude='.env' \
-              /home/runner/work/AtomicSec/AtomicSec/Atomic/ $SSH_USER@$SSH_HOSTS:/var/www/atomic.sec/producao/
+              /home/runner/work/AtomicSec/AtomicSec/Atomic/ $SSH_USER@$SSH_HOST:/var/www/atomic.sec/producao/
 
