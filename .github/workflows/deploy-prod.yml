@@ -1,0 +1,68 @@
+name: Deploy Producao
+
+on:
+  workflow_dispatch:
+    inputs:
+      fresh-deploy:
+        description: 'Limpa por completo o ambiente de produção antes de fazer o deploy'
+        required: false
+        default: 'false'
+        type: boolean
+  push:
+    branches:
+      - master
+jobs:
+  Deploy-Producao:
+    runs-on: ubuntu-latest
+    steps:
+    
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    - name: Setup SSH Connection
+      env:
+        SSH_USER:  ${{ secrets.SERVER_USER }}
+        SSH_KEY:   ${{ secrets.SERVER_KEY }}
+        SSH_HOSTS: ${{ secrets.SERVER_HOST }}
+      run: |
+        mkdir -p ~/.ssh
+        echo "$SSH_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        cat >> ~/.ssh/config <<END
+        Host producao-host
+          HostName $SSH_HOSTS
+          User $SSH_USER
+          IdentityFile ~/.ssh/id_rsa
+          StrictHostKeyChecking no
+        END	
+
+    - name: Limpando Servidor
+      if: ${{ github.event.inputs.fresh-deploy == 'true' }}
+      continue-on-error: true
+      env:
+        DB_PASS: ${{ secrets.DB_PASS }}
+      run: |
+        ssh producao-host "rm -rf /var/www/atomic.sec/producao/*"
+        ssh producao-host "mysql -u atomic.sec -p$DB_PASS -e 'DROP DATABASE producao; CREATE DATABASE producao;'"
+
+    - name: Copy files to server
+      run: |
+        rsync -vz 
+              --delete 
+              --inplace
+              --no-perms
+              --recursive
+              --whole-file
+              --exclude='.git' 
+              --exclude='.github' 
+              --exclude='node_modules' 
+              --exclude='vendor' 
+              --exclude='storage' 
+              --include='public/.htaccess'
+              --include='public/favicon.ico'
+              --include='public/index.php'
+              --include='public/images'
+              --exclude='public/*'
+              --exclude='.env'
+              /home/runner/work/AtomicSec/AtomicSec/Atomic/ producao-host:/var/www/atomic.sec/producao/
+
