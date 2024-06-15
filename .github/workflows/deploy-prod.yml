@@ -80,11 +80,12 @@ jobs:
         SSH_USER: ${{ secrets.SERVER_USER }}
         ENV_PRODUCAO: ${{ secrets.ENV_PRODUCAO }}
       run: |
-        #Install composer dependencies
-        ssh producao-host "cd /var/www/atomic.sec/producao/ && composer install --no-dev --optimize-autoloader"
+        #Setup .env
         echo "$ENV_PRODUCAO" > env_producao
         scp ./env_producao producao-host:/var/www/atomic.sec/producao/.env
         rm ./env_producao
+        #Install composer dependencies
+        ssh producao-host "cd /var/www/atomic.sec/producao/ && composer install --no-dev --optimize-autoloader"
         #set permissions
         ssh producao-host "sudo chown www-data:www-data -R /var/www/atomic.sec/producao/"
         ssh producao-host "sudo chmod 775 -R /var/www/atomic.sec/producao/"
