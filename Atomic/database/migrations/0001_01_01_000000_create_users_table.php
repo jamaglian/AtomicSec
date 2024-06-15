@@ -1,8 +1,11 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 return new class extends Migration
 {
@@ -23,6 +26,14 @@ return new class extends Migration
             $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
         });
 
+        User::factory()->create([
+            'name' => 'Admin',
+            'email' => 'admin@atomicsec.com.br',
+            'email_verified_at' => now(),
+            'password' => Hash::make('12345678'),
+            'remember_token' => Str::random(10),
+        ]);
+        
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');
