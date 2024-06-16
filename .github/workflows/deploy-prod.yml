@@ -45,14 +45,26 @@ jobs:
         DB_USER: ${{ secrets.SERVER_USER }}
         DB_PASS: ${{ secrets.DB_PASS }}
       run: |
+        ssh producao-host "sudo systemctl stop prod_laravel_worker.service"
         ssh producao-host "sudo rm -rf /var/www/atomic.sec/producao/*"
         ssh producao-host "mysql -u $DB_USER -p$DB_PASS -e 'DROP DATABASE producao; CREATE DATABASE producao;'"
+
+
     - name: Build Assets
       run: |
         cd /home/runner/work/AtomicSec/AtomicSec/Atomic/
         npm install
         npm run build
         cd /home/runner/work/AtomicSec/AtomicSec/
+
+    - name: Build and send AnalyzerAgent
+      run: |
+        cd /home/runner/work/AtomicSec/AtomicSec/AnalyzerAgent/
+        docker build -t "analyzeragent:latest" .
+        docker save -o analyzeragent-latest.tar analyzeragent:latest
+        scp ./analyzeragent-latest.tar producao-host:~/analyzeragent-latest.tar
+        ssh producao-host "docker load -i ~/analyzeragent-latest.tar"
+
     - name: Web platform sync files
       run: |
         rsync -z \
@@ -100,3 +112,4 @@ jobs:
         ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan view:cache"
         ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan storage:link"
         ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan queue:restart"
+        ssh producao-host "sudo systemctl start prod_laravel_worker.service"
