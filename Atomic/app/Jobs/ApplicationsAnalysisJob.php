@@ -62,7 +62,7 @@ class ApplicationsAnalysisJob implements ShouldQueue, ShouldBeUnique
                 // Se o status de saída indicar um erro, falhe o job
                 $this->applicationsAnalysis->status = 'Erro.';
                 $this->applicationsAnalysis->save(); // Save log in real-time
-                $this->fail('O comando Docker falhou com o status de saída: ' . $status);
+                $this->fail('O comando Docker (' . $dockerCommand . ') falhou com o status de saída: ' . $status);
             } else {
                 // Se não houver erros, atualize as informações de finalização e status
                 $filePath = env('CACHE_DATA_PATH', '/shared/') . str_replace('.', '_', $this->getDomain($this->applicationsAnalysis->application->url)) . '.json';
