@@ -41,7 +41,7 @@ class ApplicationsAnalysisJob implements ShouldQueue, ShouldBeUnique
         $this->applicationsAnalysis->status = 'Rodando...';
         $this->applicationsAnalysis->save(); // Save log in real-time
         // Command to start Docker container
-        $dockerCommand = "docker run -it -v atomic_shared_vol:/home/node/app/result --rm analyzeragent node index.js {$this->applicationsAnalysis->application->url} --result_filename=". str_replace('.', '_', $this->getDomain($this->applicationsAnalysis->application->url));
+        $dockerCommand = "docker run -it -v " . env('CACHE_DATA_PATH', 'atomic_shared_vol') . ":/home/node/app/result --rm analyzeragent node index.js {$this->applicationsAnalysis->application->url} --result_filename=". str_replace('.', '_', $this->getDomain($this->applicationsAnalysis->application->url));
         // Open a pipe to the Docker process
         $process = proc_open($dockerCommand, [1 => ['pipe', 'w']], $pipes);
 
@@ -65,7 +65,7 @@ class ApplicationsAnalysisJob implements ShouldQueue, ShouldBeUnique
                 $this->fail('O comando Docker falhou com o status de saída: ' . $status);
             } else {
                 // Se não houver erros, atualize as informações de finalização e status
-                $filePath = '/shared/' . str_replace('.', '_', $this->getDomain($this->applicationsAnalysis->application->url)) . '.json';
+                $filePath = env('CACHE_DATA_PATH', '/shared/') . str_replace('.', '_', $this->getDomain($this->applicationsAnalysis->application->url)) . '.json';
                 // Verifica se o arquivo existe
                 if (file_exists($filePath)) {
                     // Lê o conteúdo do arquivo JSON
