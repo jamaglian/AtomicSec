@@ -12,21 +12,27 @@
                     <div>
                         <b>Status:</b> {{$analise->status}}</br>
                         @if($links_encontrados != null)
+                        </br></br>
                         <b>Informações por link:</b>
-                        <div id="accordion">
                             @php
                                 $counter = 1;
                             @endphp
+                            <dl>
                             @foreach($links_encontrados as $key => $links)
-                            <div class="card">
-                                <div class="card-header" id="heading{{$counter}}">
+                            <b>{{$key}}</b></br>
+                            <b>Tempo médio de resposta:</b> {{$links->media}}ms </br>
+                                    <dt> Tempo de resposta em cada requisição:</b> </dt>
+                                    @foreach($links->times as $key => $time)
+                                        <dd><b>{{$key + 1}}:</b> {{$time->serverProcessingTime}}ms </dd>
+                                    @endforeach
+                            <!-- div class="card-header" id="heading{{$counter}}">
                                 <h5 class="mb-0">
                                     <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse{{$counter}}" aria-expanded="true" aria-controls="collapse{{$counter}}">
                                     {{$key}}
                                     </button>
                                 </h5>
                                 </div>
-                                <div id="collapse{{$counter}}" class="collapse collapsed" aria-labelledby="heading{{$counter}}" data-parent="#accordion">
+                                <div id="collapse{{$counter}}" class="collapse" aria-labelledby="heading{{$counter}}" data-parent="#accordion">
                                     <div class="card-body">
                                         <b>Tempo médio de resposta:</b> {{$links->media}}ms <br>
                                         <b> Tempo de resposta em cada requisição:</b> <br>
@@ -35,26 +41,19 @@
                                         @endforeach
                                     </div>
                                 </div>
-                            </div>
+                            </div -->
                             @php
                                 $counter++;
                             @endphp
                             @endforeach
                             
-                        </div>
+                            </dl></br></br>
                         @endif
                         
                         <b>Log:</b></br>
-                        <p>
-                            <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-                                Ver logs
-                            </a>
-                        </p>
-                        <div class="collapse" id="collapseExample">
-                            <div class="card card-body">
-                                {!! nl2br(e($analise->log)) !!}
-                            </div>
-                        </div>
+                        <textarea id="w3review" name="w3review" rows="30" cols="130" disabled>
+                            {{$analise->log}}
+                        </textarea>
                     </div>
                 </div>
             </div>
