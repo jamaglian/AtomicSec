@@ -113,5 +113,16 @@ class AnalysisController extends Controller
             "analise"      => $analysis
         ]);
     }
-
+    /**
+     * Apaga uma análise.
+     *
+     * @param Request $request A requisição HTTP recebida.
+     * @return RedirectResponse Uma resposta de redirecionamento, se aplicável.
+     */
+    public function delete($id): RedirectResponse
+    {
+        $analysis = ApplicationsAnalysis::findOrFail($id);
+        $analysis->delete();
+        return redirect(route('analysis.index', absolute: false))->with('success', __('Analise deletada com sucesso.'));
+    }
 }

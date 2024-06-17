@@ -24,6 +24,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/cadastrar', [AplicacoesController::class, 'cadastro'])->name('aplicacoes.cadastrar');
         Route::prefix('analises')->group(function () {
             Route::get('/', [AnalysisController::class, 'index'])->name('analysis.index');
+            Route::delete('/delete/{id}', [AnalysisController::class, 'delete'])->name('analysis.delete');
             Route::get('/cadastrar', [AnalysisController::class, 'cadastrof'])->name('analysis.cadastrof');
             Route::post('/cadastrar', [AnalysisController::class, 'cadastro'])->name('analysis.cadastro');
             Route::get('/{id}', [AnalysisController::class, 'analise'])->name('analysis.analise');
