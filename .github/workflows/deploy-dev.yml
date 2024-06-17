@@ -1,18 +1,18 @@
-name: Deploy Producao
+name: Deploy Dev
 
 on:
   workflow_dispatch:
     inputs:
       fresh-deploy:
-        description: 'Limpa por completo o ambiente de produção antes de fazer o deploy'
+        description: 'Limpa por completo o ambiente de desenvolvimento antes de fazer o deploy'
         required: false
         default: 'false'
         type: boolean
   push:
     branches:
-      - main
+      - dev
 jobs:
-  Deploy-Producao:
+  Deploy-Desenvolvimento:
     runs-on: ubuntu-latest
     steps:
     
@@ -30,7 +30,7 @@ jobs:
         echo "$SSH_KEY" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         cat >>~/.ssh/config <<END
-        Host producao-host
+        Host desenvolvimento-host
           HostName $SSH_HOST
           User $SSH_USER
           Port $SSH_PORT
@@ -45,9 +45,9 @@ jobs:
         DB_USER: ${{ secrets.SERVER_USER }}
         DB_PASS: ${{ secrets.DB_PASS }}
       run: |
-        ssh producao-host "sudo systemctl stop prod_laravel_worker.service"
-        ssh producao-host "sudo rm -rf /var/www/atomic.sec/producao/*"
-        ssh producao-host "mysql -u $DB_USER -p$DB_PASS -e 'DROP DATABASE producao; CREATE DATABASE producao;'"
+        ssh desenvolvimento-host "sudo systemctl stop dev_laravel_worker.service"
+        ssh desenvolvimento-host "sudo rm -rf /var/www/atomic.sec/dev/*"
+        ssh desenvolvimento-host "mysql -u $DB_USER -p$DB_PASS -e 'DROP DATABASE dev; CREATE DATABASE dev;'"
 
 
     - name: Build Assets
@@ -60,10 +60,10 @@ jobs:
     - name: Build and send AnalyzerAgent
       run: |
         cd /home/runner/work/AtomicSec/AtomicSec/AnalyzerAgent/
-        docker build -t "analyzeragent:latest" .
-        docker save -o analyzeragent-latest.tar analyzeragent:latest
-        scp ./analyzeragent-latest.tar producao-host:~/analyzeragent-latest.tar
-        ssh producao-host "docker load -i ~/analyzeragent-latest.tar && rm ~/analyzeragent-latest.tar"
+        docker build -t "analyzeragent:dev" .
+        docker save -o analyzeragent-dev.tar analyzeragent:dev
+        scp ./analyzeragent-dev.tar desenvolvimento-host:~/analyzeragent-dev.tar
+        ssh desenvolvimento-host "docker load -i ~/analyzeragent-dev.tar && rm ~/analyzeragent-dev.tar"
 
     - name: Web platform sync files
       run: |
@@ -86,30 +86,30 @@ jobs:
               --include='public/build' \
               --exclude='public/*' \
               --exclude='.env' \
-              /home/runner/work/AtomicSec/AtomicSec/Atomic/ producao-host:/var/www/atomic.sec/producao/
+              /home/runner/work/AtomicSec/AtomicSec/Atomic/ desenvolvimento-host:/var/www/atomic.sec/dev/
 
     - name: Setup web platform
       env:
         SSH_USER: ${{ secrets.SERVER_USER }}
-        ENV_PRODUCAO: ${{ secrets.ENV_PRODUCAO }}
+        ENV_DEV: ${{ secrets.ENV_DEV }}
       run: |
         #Setup .env
-        echo "$ENV_PRODUCAO" > env_producao
-        scp ./env_producao producao-host:/var/www/atomic.sec/producao/.env
-        rm ./env_producao
+        echo "$ENV_DEV" > env_dev
+        scp ./env_dev desenvolvimento-host:/var/www/atomic.sec/dev/.env
+        rm ./env_dev
         #Install composer dependencies
-        ssh producao-host "cd /var/www/atomic.sec/producao/ && composer install --no-dev --optimize-autoloader"
+        ssh desenvolvimento-host "cd /var/www/atomic.sec/dev/ && composer install --no-dev --optimize-autoloader"
         #set permissions
-        ssh producao-host "sudo chown www-data:www-data -R /var/www/atomic.sec/producao/"
-        ssh producao-host "sudo chmod 775 -R /var/www/atomic.sec/producao/"
+        ssh desenvolvimento-host "sudo chown www-data:www-data -R /var/www/atomic.sec/dev/"
+        ssh desenvolvimento-host "sudo chmod 775 -R /var/www/atomic.sec/dev/"
 
     - name: Setup again
       if: ${{ github.event.inputs.fresh-deploy == 'true' }}
       run: |
-        ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan migrate --force"
-        ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan config:cache"
-        ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan route:cache"
-        ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan view:cache"
-        ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan storage:link"
-        ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan queue:restart"
-        ssh producao-host "sudo systemctl start prod_laravel_worker.service"
+        ssh desenvolvimento-host "cd /var/www/atomic.sec/dev/ && php artisan migrate --force"
+        ssh desenvolvimento-host "cd /var/www/atomic.sec/dev/ && php artisan config:cache"
+        ssh desenvolvimento-host "cd /var/www/atomic.sec/dev/ && php artisan route:cache"
+        ssh desenvolvimento-host "cd /var/www/atomic.sec/dev/ && php artisan view:cache"
+        ssh desenvolvimento-host "cd /var/www/atomic.sec/dev/ && php artisan storage:link"
+        ssh desenvolvimento-host "cd /var/www/atomic.sec/dev/ && php artisan queue:restart"
+        ssh desenvolvimento-host "sudo systemctl start dev_laravel_worker.service"
