@@ -40,7 +40,7 @@
                                 <td>{{ $analise->status }}</td>
                                 <td>
                                     <a href="{{ route('analysis.analise', ['id' => $analise->id]) }}" class="btn btn-sm btn-primary">Ver</a>
-                                    <a href="#" class="btn btn-sm btn-danger">Excluir</a>
+                                    <a href="#"  data-toggle="modal" data-target="#exampleModal" class="btn btn-sm btn-danger">Excluir</a>
                                 </td>
                             </tr>
                             @endforeach
