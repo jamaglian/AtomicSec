@@ -95,6 +95,7 @@ jobs:
       run: |
         #Setup .env
         echo "$ENV_PRODUCAO" > env_producao
+        ssh desenvolvimento-host "rm /var/www/atomic.sec/producao/.env"
         scp ./env_producao producao-host:/var/www/atomic.sec/producao/.env
         rm ./env_producao
         #Install composer dependencies
