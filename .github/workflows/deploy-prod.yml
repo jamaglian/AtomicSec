@@ -113,4 +113,4 @@ jobs:
         ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan view:cache"
         ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan storage:link"
         ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan queue:restart"
-        ssh producao-host "sudo systemctl start prod_laravel_worker.service"
+        ssh producao-host "sudo systemctl restart prod_laravel_worker.service"
