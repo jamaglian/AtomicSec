@@ -14,6 +14,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use App\Jobs\ApplicationsAnalysisJob;
 use App\Models\ApplicationsAnalysis;
+use Illuminate\Console\Application;
 use Illuminate\Support\Facades\Redirect;
 
 class AnalysisController extends Controller
@@ -108,9 +109,14 @@ class AnalysisController extends Controller
     public function analise($id): View
     {
         $analysis = ApplicationsAnalysis::findOrFail($id);
-
+        $aplication = Applications::findOrFail($analysis->application_id);
+        if($this->empresa->id != $aplication->company_id) {
+            return redirect(route('analysis.index', absolute: false))->with('error', __('Você não tem permissão para acessar essa análise.'));
+        }
+        $analysis_data = json_decode($analysis->analysis);
         return view('analises/analise', [
-            "analise"      => $analysis
+            "analise"                => $analysis,
+            "links_encontrados"      => ((isset($analysis_data->serverRequestTimeMap))?$analysis_data->serverRequestTimeMap:null),
         ]);
     }
     /**
@@ -122,6 +128,10 @@ class AnalysisController extends Controller
     public function delete($id): RedirectResponse
     {
         $analysis = ApplicationsAnalysis::findOrFail($id);
+        $aplication = Applications::findOrFail($analysis->application_id);
+        if($this->empresa->id != $aplication->company_id) {
+            return redirect(route('analysis.index', absolute: false))->with('error', __('Você não tem permissão para deletar essa análise.'));
+        }
         $analysis->delete();
         return redirect(route('analysis.index', absolute: false))->with('success', __('Analise deletada com sucesso.'));
     }
