@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Applications;
 use App\Models\ApplicationsAnalysis;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -86,6 +87,11 @@ class ApplicationsAnalysisJob implements ShouldQueue, ShouldBeUnique
                         $this->applicationsAnalysis->finish_at = now();
                         $this->applicationsAnalysis->status = 'Finalizada.';
                         $this->applicationsAnalysis->save(); // Save log in real-time
+                        if($jsonData['possibleCMS']){
+                            $application = Applications::find($this->applicationsAnalysis->application_id);
+                            $application->type = $jsonData['possibleCMSType'];
+                            $application->save();
+                        }
                         unlink($filePath);
                     } else {
                         $this->applicationsAnalysis->status = 'Erro.';
