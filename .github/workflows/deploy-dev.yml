@@ -113,3 +113,4 @@ jobs:
         ssh desenvolvimento-host "cd /var/www/atomic.sec/dev/ && php artisan storage:link"
         ssh desenvolvimento-host "cd /var/www/atomic.sec/dev/ && php artisan queue:restart"
         ssh desenvolvimento-host "sudo systemctl start dev_laravel_worker.service"
+        
