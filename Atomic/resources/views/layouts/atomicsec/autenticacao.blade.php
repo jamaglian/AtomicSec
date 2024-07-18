@@ -20,10 +20,10 @@
 
         <div class="container h-100">
             <div class="row h-100 justify-content-center align-items-center">
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div>
                         <a href="/">
-                            <img class="rounded mx-auto d-block" style="height: 150px;" src="/images/Logo.png" />
+                            <img class="rounded mx-auto d-block" style="height: 200px;" src="/images/Logo.png" />
                         </a>
                     </div>
                     <div class="card">
@@ -36,14 +36,11 @@
         </div>
 
         <!-- Scripts -->
-        @vite([
-            'resources/js/jquery.js',
-            'resources/js/bootstrap.bundle.js',
-            'resources/js/fullcalendar.js',
-            'resources/js/atomic.js'
-        ])
+        <script src="/js/jquery.min.js"></script>
+        <script src="/js/bootstrap.bundle.min.js"></script>
+        <script src="/js/atomic.min.js"></script>
         <script src="/js/datatables.min.js"></script>
         <script src="/js/moment.min.js"></script>
-
+        <script src="/js/fullcalendar.min.js"></script>
     </body>
 </html>

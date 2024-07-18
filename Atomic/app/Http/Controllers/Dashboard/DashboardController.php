@@ -27,7 +27,7 @@ class DashboardController extends Controller
         $user = Auth::user();
         $empresa = $user->companies->firstWhere('id', $request->session()->get('company'));
         if($user->isGlobalAdmin() || $empresa){
-            return view('dashboard', [
+            return view('atomicsec.dashboard.index', [
                 "company" => $empresa
             ]);
         }else{

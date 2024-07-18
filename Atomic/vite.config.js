@@ -13,11 +13,7 @@ export default defineConfig({
                 'resources/css/bootstrap.css',
                 'resources/css/datatables.css',
                 'resources/css/fullcalendar.css',
-                'resources/css/atomic.css',
-                'resources/js/jquery.js',
-                'resources/js/bootstrap.bundle.js',
-                'resources/js/fullcalendar.js',
-                'resources/js/atomic.js'
+                'resources/css/atomic.css'
             ],
             refresh: true,
         }),
