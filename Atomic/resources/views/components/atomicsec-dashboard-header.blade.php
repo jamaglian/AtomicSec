@@ -1,11 +1,10 @@
-<nav class="navbar navbar-expand navbar-dark bg-primary">
+<nav class="navbar navbar-expand navbar-dark bg-danger">
     <a class="sidebar-toggle mr-3" href="#"><i class="fa fa-bars"></i></a>
-    <a class="navbar-brand" href="/dashboard">{{ config('app.name', 'Laravel') }}</a>
-
+    <a class="navbar-brand" href="/dashboard">
+        <img src="/images/Logo.png" alt="Logo" style="height: 60px;"> {{ config('app.name', 'Laravel') }}
+    </a>
     <div class="navbar-collapse collapse">
         <ul class="navbar-nav ml-auto">
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fa fa-envelope"></i> 5</a></li>
-            <li class="nav-item"><a href="#" class="nav-link"><i class="fa fa-bell"></i> 3</a></li>
             <li class="nav-item dropdown">
                 <a href="#" id="dd_user" class="nav-link dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> {{ Auth::user()->name }}</a>
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dd_user">

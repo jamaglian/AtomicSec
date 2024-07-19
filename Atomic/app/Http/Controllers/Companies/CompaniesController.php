@@ -23,7 +23,7 @@ class CompaniesController extends Controller
     public function view_gadmin(Request $request): View
     {
         $companies = Companies::with('owner')->get();
-        return view('gadmin/empresas', [ 
+        return view('atomicsec.dashboard.gadmin.empresas.index', [ 
             'registros' => $companies
         ]);
     }
