@@ -40,7 +40,7 @@ class AplicacoesController extends Controller
      */
     public function index(Request $request): View
     {
-        return view('aplicacoes/aplicacoes', [
+        return view('atomicsec.dashboard.aplicacoes.index', [
             "company"      => $this->empresa,
             "applications" => $this->empresa->applications
         ]);
@@ -54,7 +54,7 @@ class AplicacoesController extends Controller
      */
     public function cadastrof(Request $request): View
     {
-        return view('aplicacoes/cadastrar', [
+        return view('atomicsec.dashboard.aplicacoes.cadastro', [
             "company"     => $this->empresa
         ]);
     }

@@ -53,7 +53,7 @@ class AnalysisController extends Controller
                 $allAnalyses[] = $analysis;
             }
         }
-        return view('analises/analises', [
+        return view('atomicsec.dashboard.analises.index', [
             "company"      => $this->empresa,
             "applications" => $this->empresa->applications,
             "analises"     => $allAnalyses

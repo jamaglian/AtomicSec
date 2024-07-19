@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand navbar-dark bg-danger">
     <a class="sidebar-toggle mr-3" href="#"><i class="fa fa-bars"></i></a>
-    <a class="navbar-brand" href="/dashboard">
+    <a class="navbar-brand" href="{{route('dashboard')}}">
         <img src="/images/Logo.png" alt="Logo" style="height: 60px;"> {{ config('app.name', 'Laravel') }}
     </a>
     <div class="navbar-collapse collapse">

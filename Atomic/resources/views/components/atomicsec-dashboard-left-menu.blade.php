@@ -1,12 +1,25 @@
 <div class="sidebar sidebar-dark bg-dark">
     <ul class="list-unstyled">
         <li {!! (( request()->routeIs('dashboard')? 'class="active"' : '' )) !!} >
-            <a href="index.html">
+            <a href="{{route('dashboard')}}">
                 <i class="fa fa-fw fa-home"></i>
                  Home
             </a>
         </li>
-        @if(Auth::user()->isGlobalAdmin() )
+        @if( !Auth::user()->isGlobalAdmin() )
+        <li {!! (( request()->routeIs('aplicacoes.index')? 'class="active"' : '' )) !!} >
+            <a href="{{route('aplicacoes.index')}}">
+                <i class="fa fa-fw fa-laptop-code"></i>
+                 Aplicações Cadastradas
+            </a>
+        </li>
+        <li {!! (( request()->routeIs('analysis.index') ? 'class="active"' : '' )) !!} >
+            <a href="{{route('analysis.index')}}">
+                <i class="fa fa-fw fa-chart-bar"></i>
+                Análises
+            </a>
+        </li>
+        @else
             <li>
                 <a href="#sm_admin" data-toggle="collapse">
                     <i class="fa fa-fw fa-tools"></i> Admin

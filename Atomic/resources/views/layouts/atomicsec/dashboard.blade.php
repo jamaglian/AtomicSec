@@ -1,3 +1,8 @@
+@props(
+    [
+        'extra_script'
+    ]
+)
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -32,5 +37,12 @@
         <script src="/js/datatables.min.js"></script>
         <script src="/js/moment.min.js"></script>
         <script src="/js/fullcalendar.min.js"></script>
+        @if(isset($extra_script))
+        <script>
+            {!!
+                 $extra_script
+            !!}
+        </script>
+        @endif
     </body>
 </html>

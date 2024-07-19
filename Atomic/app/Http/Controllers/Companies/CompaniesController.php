@@ -36,7 +36,7 @@ class CompaniesController extends Controller
      */
     public function cadastrof_gadmin(Request $request): View
     {
-        return view('gadmin/empresas/cadastrar');
+        return view('atomicsec.dashboard.gadmin.empresas.cadastro');
     }
 
     /**
