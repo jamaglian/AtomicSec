@@ -56,7 +56,7 @@
                             @endif
                             <td>{{ $analise->status }}</td>
                             <td>
-                            <a href="#" class="btn btn-icon btn-pill btn-primary" data-toggle="tooltip" title="Edit"><i class="fa fa-fw fa-edit"></i></a>
+                            <a href="{{ route('analysis.analise', ['id' => $analise->id]) }}" class="btn btn-icon btn-pill btn-primary" data-toggle="tooltip" title="Ver"><i class="fa fa-fw fa-eye"></i></a>
                             <a href="#" class="btn btn-icon btn-pill btn-danger" data-toggle="modal" data-target="#modal_delete" data-item="{{ $analise->id }}" title="Delete"><i class="fa fa-fw fa-trash"></i></a>
                             </td>
                         </tr>

@@ -67,7 +67,7 @@ class AnalysisController extends Controller
      */
     public function cadastrof(Request $request): View
     {
-        return view('analises/cadastrar', [
+        return view('atomicsec.dashboard.analises.cadastrar', [
             "company"      => $this->empresa,
             "applications" => $this->empresa->applications,
         ]);
