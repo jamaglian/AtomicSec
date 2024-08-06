@@ -22,6 +22,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [AplicacoesController::class, 'index'])->name('aplicacoes.index');
         Route::get('/cadastrar', [AplicacoesController::class, 'cadastrof'])->name('aplicacoes.cadastrarf');
         Route::post('/cadastrar', [AplicacoesController::class, 'cadastro'])->name('aplicacoes.cadastrar');
+        Route::delete('/delete/{id}', [AplicacoesController::class, 'delete'])->name('aplicacoes.delete');
         Route::prefix('analises')->group(function () {
             Route::get('/', [AnalysisController::class, 'index'])->name('analysis.index');
             Route::delete('/delete/{id}', [AnalysisController::class, 'delete'])->name('analysis.delete');

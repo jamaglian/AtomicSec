@@ -8,6 +8,7 @@ use Illuminate\View\View;
 use Illuminate\Http\Request;
 use App\Models\Applications;
 use Illuminate\Validation\Rules;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Controller;
@@ -80,5 +81,25 @@ class AplicacoesController extends Controller
 
         return redirect(route('aplicacoes.index', absolute: false))->with('success', __('Aplicação cadastrada com sucesso.'));
     }
+    /**
+     * Apaga uma análise.
+     *
+     * @param Request $request A requisição HTTP recebida.
+     * @return RedirectResponse Uma resposta de redirecionamento, se aplicável.
+     */
+    public function delete($id): RedirectResponse
+    {
+        $aplication = Applications::findOrFail($id);
+        if($this->empresa->id != $aplication->company_id) {
+            return redirect(route('aplicacoes.index', absolute: false))->with('error', __('Você não tem permissão para deletar essa aplicação.'));
+        }
+        DB::transaction(function () use ($aplication) {
+            // Delete as análises associadas à aplicação
+            $aplication->analysis()->delete();
 
+            // Delete a aplicação
+            $aplication->delete();
+        });
+        return redirect(route('aplicacoes.index', absolute: false))->with('success', __('Aplicação deletada com sucesso.'));
+    }
 }

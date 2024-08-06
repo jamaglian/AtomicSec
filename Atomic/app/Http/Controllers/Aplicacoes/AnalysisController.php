@@ -114,7 +114,7 @@ class AnalysisController extends Controller
             return redirect(route('analysis.index', absolute: false))->with('error', __('Você não tem permissão para acessar essa análise.'));
         }
         $analysis_data = json_decode($analysis->analysis);
-        return view('analises/analise', [
+        return view('atomicsec.dashboard.analises.analise', [
             "analise"                => $analysis,
             "links_encontrados"      => ((isset($analysis_data->serverRequestTimeMap))?$analysis_data->serverRequestTimeMap:null),
         ]);

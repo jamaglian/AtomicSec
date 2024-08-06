@@ -1,21 +1,4 @@
-<x-dashboard-layout
-    extra_script="
-    $(document).ready(function () {$('#analises_table').DataTable();});
-    $('#modal_delete').on('show.bs.modal', function (event) {
-    var button = $(event.relatedTarget); // Element that triggered the modal
-    var item = button.data('item'); // Extract info from data-* attributes
-
-    // Update the modal's content.
-    var modal = $(this);
-    modal.find('.modal-title').text(modal.find('.modal-title').text() + ' ( Aplicação ' + item + ' )');
-
-    // Pass the item to the delete function
-    $('#modal_delete_confirm').off('click').on('click', function () {
-        // Simulate a mouse click:
-        //window.location.href = '';
-        alert(' Falta programar a ação de deletar a aplicação ' + item);
-    });
-  });">
+<x-dashboard-layout>
     <h2 class="mb-4">Análises @if(Auth::user()->isGlobalAdmin()) <b class="text-danger"> (Global Admin) </b> @endif </h2>
     <div class="card mb-4">
         <div class="card-body">
@@ -73,4 +56,33 @@
         texto_confirmacao="Deletar" 
         texto_cancelar="Cancelar"
     ></x-atomicsec-modal>
+    <x-slot name="extra_script">
+        $(document).ready(function () {$('#analises_table').DataTable();});
+        $('#modal_delete').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget); // Element that triggered the modal
+            var item = button.data('item'); // Extract info from data-* attributes
+
+            // Update the modal's content.
+            var modal = $(this);
+            modal.find('.modal-title').text(modal.find('.modal-title').text() + ' ( Aplicação ' + item + ' )');
+
+            // Pass the item to the delete function
+            $('#modal_delete_confirm').off('click').on('click', function () {
+                var token = $('meta[name="csrf-token"]').attr('content'); // Assuming you have CSRF token in a meta tag
+
+                $('<form>', {
+                    "method": "post",
+                    "action": "{{ route('analysis.delete', '') }}/" + item
+                }).append($('<input>', {
+                    "type": "hidden",
+                    "name": "_method",
+                    "value": "delete"
+                })).append($('<input>', {
+                    "type": "hidden",
+                    "name": "_token",
+                    "value": token
+                })).appendTo(document.body).submit();
+            });
+        });
+    </x-slot>
 </x-dashboard-layout>

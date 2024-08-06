@@ -37,6 +37,7 @@
         <script src="/js/datatables.min.js"></script>
         <script src="/js/moment.min.js"></script>
         <script src="/js/fullcalendar.min.js"></script>
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
         @if(isset($extra_script))
         <script>
             {!!
