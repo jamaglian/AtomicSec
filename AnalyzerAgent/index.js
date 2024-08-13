@@ -1,5 +1,6 @@
 import fs from 'fs';
 import scrape from 'website-scraper'; // only as ESM, no CommonJS
+import {HttpsProxyAgent} from 'hpagent';
 import AnalyzerAgentPlugin from './libs/AnalyzerAgentPlugin.js'; // only as ESM, no CommonJS
 
 var url_scrape = '';
@@ -68,13 +69,25 @@ fs.writeFileSync(filePath, jsonString);
 
 const options = {
   urls: [url_scrape],
-  urlFilter: (url) => url.startsWith(url_scrape), // Filter links to other websites
+  urlFilter: function(url) {
+    return url.indexOf(url_scrape.replace(/^https?:\/\//, '').replace(/\/$/, '')) > -1;
+  },
   recursive: true,
   filenameGenerator: 'bySiteStructure',
   directory: 'teste/',
   request: {
     headers: {
       'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'
+    },
+    agent: {
+      https: new HttpsProxyAgent({
+        keepAlive: true,
+        keepAliveMsecs: 1000,
+        maxSockets: 256,
+        maxFreeSockets: 256,
+        scheduling: 'lifo',
+        proxy: 'http://p.webshare.io:9999/'
+      })
     }
   },
   contrxt: { out_cli },
