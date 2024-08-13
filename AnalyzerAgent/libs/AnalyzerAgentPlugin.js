@@ -101,6 +101,7 @@ class AnalyzerAgentPlugin {
                 logger.info('Gravando tempo de resposta:', { url });
                 logger.info('O tempo de resposta do servidor foi:', { serverProcessingTime });
             }
+            console.log(response.body.toString('utf-8'));
             return response;
         });
         registerAction('afterFinish', async () => {
