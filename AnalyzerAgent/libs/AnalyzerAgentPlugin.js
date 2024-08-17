@@ -20,48 +20,58 @@ class AnalyzerAgentPlugin {
     
 	constructor ({
 		launchOptions = {},
-        ignoreCss = true,
-        ignoreJs = true,
-        ignoreImages = true,
-        ignoreFontFiles = true,
-        ignoreVideoFiles = true,
+        ignores = {},
         result_filename = 'resultado.json',
         all_times = false
 	} = {}) {
+        /**
+         * Plugin options
+         */
 		this.launchOptions = launchOptions;
-        this.ignoreCss = ignoreCss;
-        this.ignoreJs = ignoreJs;
-        this.ignoreImages = ignoreImages;
-        this.ignoreFontFiles = ignoreFontFiles;
-        this.ignoreVideoFiles = ignoreVideoFiles;
-        this.result_filename = result_filename;
-        this.all_times = all_times;
-        this.possibleCMS = false;
+        this.ignores = ignores;
         this.resultadoPath = './result/' + result_filename;
+        this.all_times = all_times;
+        console.log(this.ignores);
+        /**
+         * Load resultado.json
+         */
         this.resultadoJson = JSON.parse(fs.readFileSync(this.resultadoPath, 'utf8'));
+        this.serverRequestTimeMap = this.resultadoJson.serverRequestTimeMap;
+
+        /**
+         * CMS Verifications
+         */
+        this.possibleCMS = false;
         this.possibleCMSType = '';
         this.possibleCMSVerison = '';
-        this.serverRequestTimeMap = this.resultadoJson.serverRequestTimeMap;
-		logger.info('init plugin', { launchOptions });
+
+        /**
+         * Logger
+         */
+        logger.info('init plugin', { launchOptions });
 	}
 
 	apply (registerAction) {
 		registerAction('beforeRequest', async ({resource, requestOptions}) => {
+            /**
+             * Verify if the request is a css, js, image or font file
+             * and ignore it if necessary
+             */
             var uri = resource.getUrl().split('?')[0].toLowerCase();
             this.identifyWp(uri);
-            if(this.ignoreCss && uri.endsWith(".css")){
+            if(this.ignores.ignoreCss && uri.endsWith(".css")){
                 logger.info('Ignorando css:', { uri });
                 return Promise.reject(new Error('Solicitação cancelada'));
-            }else if (this.ignoreJs && uri.endsWith(".js")){
+            }else if (this.ignores.ignoreJs && uri.endsWith(".js")){
                 logger.info('Ignorando js:', { uri });
                 return Promise.reject(new Error('Solicitação cancelada'));
-            }else if (this.ignoreFontFiles && (uri.endsWith(".eot") || uri.endsWith(".ttf") || uri.endsWith(".woff2") || uri.endsWith(".woff"))){
+            }else if (this.ignores.ignoreFontFiles && (uri.endsWith(".eot") || uri.endsWith(".ttf") || uri.endsWith(".woff2") || uri.endsWith(".woff"))){
                 logger.info('Ignorando font:', { uri });
                 return Promise.reject(new Error('Solicitação cancelada'));
-            }else if (this.ignoreVideoFiles && uri.endsWith(".mp4")){
+            }else if (this.ignores.ignoreVideoFiles && uri.endsWith(".mp4")){
                 logger.info('Ignorando video:', { uri });
                 return Promise.reject(new Error('Solicitação cancelada'));
-            }else if (this.ignoreImages){
+            }else if (this.ignores.ignoreImages){
                 for (const extension of img_extensions) {
                     if (uri.endsWith(extension)){
                         logger.info('Ignorando imagem:', { uri });
@@ -72,8 +82,14 @@ class AnalyzerAgentPlugin {
             logger.info('Prosseguindo url:', { uri });
 			return {requestOptions};
 		});
+        /**
+         * Prevents the resource from being saved
+         */
         registerAction('saveResource', async ({resource}) => {return false;});
         registerAction('afterResponse', ({response}) => {
+            /**
+             * Save the server processing times
+             */
             const url = response.url
             var serverProcessingTime = 0
             if(this.serverRequestTimeMap[url] === undefined || this.resultadoJson.run > this.serverRequestTimeMap[url].times.length){
@@ -101,7 +117,6 @@ class AnalyzerAgentPlugin {
                 logger.info('Gravando tempo de resposta:', { url });
                 logger.info('O tempo de resposta do servidor foi:', { serverProcessingTime });
             }
-            console.log(response.body.toString('utf-8'));
             return response;
         });
         registerAction('afterFinish', async () => {
@@ -135,7 +150,6 @@ class AnalyzerAgentPlugin {
                 console.log(`URL: ${item.url}, Valor: ${item.valor}`);
             });
             console.log("\n\n");
-            //console.log(this.resultadoJson);
             const novoJsonString = JSON.stringify(this.resultadoJson, null, 2); // O terceiro argumento é para formatar a saída
             fs.writeFileSync(this.resultadoPath, novoJsonString);
         });
