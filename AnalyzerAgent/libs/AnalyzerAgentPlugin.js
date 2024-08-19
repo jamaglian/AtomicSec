@@ -1,5 +1,6 @@
 import fs from 'fs';
 import puppeteer from 'puppeteer';
+import isDocker from '../Utils/is_docker.js';
 import logger from './AnalyzerAgentPluginLogger.js';
 const img_extensions = [
     ".jpg",
@@ -65,10 +66,18 @@ class AnalyzerAgentPlugin {
                  * Setup puppeteer
                  */
                 // Configuração do navegador
+                if(isDocker()){
                 this.browser = await puppeteer.launch({
                     headless: true, // Defina como false se quiser ver o navegador em ação
-                    args: ['--no-sandbox', '--disable-setuid-sandbox']
+                    executablePath: '/usr/bin/chromium-browser',
+                    args: ['--no-sandbox', '--disable-setuid-sandbox', '--headless', '--disable-gpu']
                 });
+                }else{
+                    this.browser = await puppeteer.launch({
+                        headless: true, // Defina como false se quiser ver o navegador em ação
+                        args: ['--no-sandbox', '--disable-setuid-sandbox']
+                    });
+                }
             }
 		});
 		registerAction('beforeRequest', async ({resource, requestOptions}) => {
