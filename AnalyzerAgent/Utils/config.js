@@ -37,10 +37,11 @@ class Config {
         return this.settings;
     }
 
-    constructScrapeConfig() {
+    constructScrapeConfig(puppeteer = {}) {
         
         const url_scrape = this.settings['url_scrape'];
         const result_filename = this.settings['result_filename'];
+
         return {
             urls: [url_scrape],
             urlFilter: function(url) {
@@ -53,7 +54,9 @@ class Config {
             request: {
               headers: {
                 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'
-              }/* ,
+              },
+              //...puppeteer
+              /* ,
               agent: {
                 https: new HttpsProxyAgent({
                   keepAlive: true,

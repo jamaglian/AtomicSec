@@ -1,4 +1,4 @@
-const makeRequest = async (page, url, searchText = null) => {
+export const makeRequest = async (page, url, searchText = null) => {
     // Navegar até a URL
     const response = await page.goto(url, { waitUntil: 'networkidle2' });
   
@@ -21,4 +21,4 @@ const makeRequest = async (page, url, searchText = null) => {
     return { statusCode, responseText };
   };
   
-  module.exports = { makeRequest };
+  //module.exports = { makeRequest };

@@ -1,4 +1,5 @@
 import fs from 'fs';
+import puppeteer from 'puppeteer';
 import logger from './AnalyzerAgentPluginLogger.js';
 const img_extensions = [
     ".jpg",
@@ -22,7 +23,8 @@ class AnalyzerAgentPlugin {
 		launchOptions = {},
         ignores = {},
         result_filename = 'resultado.json',
-        all_times = false
+        all_times = false,
+        use_puppeteer = true
 	} = {}) {
         /**
          * Plugin options
@@ -31,7 +33,7 @@ class AnalyzerAgentPlugin {
         this.ignores = ignores;
         this.resultadoPath = './result/' + result_filename;
         this.all_times = all_times;
-        console.log(this.ignores);
+        
         /**
          * Load resultado.json
          */
@@ -46,12 +48,29 @@ class AnalyzerAgentPlugin {
         this.possibleCMSVerison = '';
 
         /**
+         * Puppeteer
+         */
+        this.use_puppeteer = use_puppeteer;
+
+        /**
          * Logger
          */
         logger.info('init plugin', { launchOptions });
 	}
 
 	apply (registerAction) {
+        registerAction('beforeStart', async () => {
+            if(this.use_puppeteer){
+                /**
+                 * Setup puppeteer
+                 */
+                // Configuração do navegador
+                this.browser = await puppeteer.launch({
+                    headless: true, // Defina como false se quiser ver o navegador em ação
+                    args: ['--no-sandbox', '--disable-setuid-sandbox']
+                });
+            }
+		});
 		registerAction('beforeRequest', async ({resource, requestOptions}) => {
             /**
              * Verify if the request is a css, js, image or font file
@@ -80,6 +99,12 @@ class AnalyzerAgentPlugin {
                 }
             }
             logger.info('Prosseguindo url:', { uri });
+
+            if(this.use_puppeteer){
+                // Crie uma nova página
+                this.page = await this.browser.newPage();
+                requestOptions.puppeteerPage = this.page;
+            }
 			return {requestOptions};
 		});
         /**
@@ -92,28 +117,47 @@ class AnalyzerAgentPlugin {
              */
             const url = response.url
             var serverProcessingTime = 0
-            if(this.serverRequestTimeMap[url] === undefined || this.resultadoJson.run > this.serverRequestTimeMap[url].times.length){
-                if(response.timings.secureConnect !== undefined){
-                    const excludeUpload = response.timings.upload - response.timings.secureConnect
-                    serverProcessingTime = (response.timings.response - response.timings.secureConnect) - excludeUpload;
-                }else{
-                    const excludeUpload = response.timings.upload - response.timings.connect
-                    serverProcessingTime = (response.timings.response - response.timings.connect) - excludeUpload;
+            if(!this.use_puppeteer){
+                if(this.serverRequestTimeMap[url] === undefined || this.resultadoJson.run > this.serverRequestTimeMap[url].times.length){
+                    if(response.timings.secureConnect !== undefined){
+                        const excludeUpload = response.timings.upload - response.timings.secureConnect
+                        serverProcessingTime = (response.timings.response - response.timings.secureConnect) - excludeUpload;
+                    }else{
+                        const excludeUpload = response.timings.upload - response.timings.connect
+                        serverProcessingTime = (response.timings.response - response.timings.connect) - excludeUpload;
+                    }
+                    if(this.serverRequestTimeMap[url] !== undefined){
+                        this.serverRequestTimeMap[url].times.push({ 
+                            serverProcessingTime: serverProcessingTime,
+                            timings: this.all_times ? response.timings : null
+                        });
+                    }else{
+                        this.serverRequestTimeMap[url] = {}
+                        this.serverRequestTimeMap[url].times = [];
+                        this.serverRequestTimeMap[url].times.push({ 
+                            serverProcessingTime: serverProcessingTime,
+                            timings: this.all_times ? response.timings : null
+                        });
+                    }
+                    console.log("O tempo para o primeiro byte da url " + url + " foi de " + serverProcessingTime);
+                    logger.info('Gravando tempo de resposta:', { url });
+                    logger.info('O tempo de resposta do servidor foi:', { serverProcessingTime });
                 }
+            }else{
                 if(this.serverRequestTimeMap[url] !== undefined){
                     this.serverRequestTimeMap[url].times.push({ 
-                        serverProcessingTime: serverProcessingTime,
-                        timings: this.all_times ? response.timings : null
+                        serverProcessingTime: response.timing.receiveHeadersStart - response.timing.sendEnd,
+                        timings: this.all_times ? response.timing : null
                     });
                 }else{
                     this.serverRequestTimeMap[url] = {}
                     this.serverRequestTimeMap[url].times = [];
                     this.serverRequestTimeMap[url].times.push({ 
-                        serverProcessingTime: serverProcessingTime,
-                        timings: this.all_times ? response.timings : null
+                        serverProcessingTime: response.timing.receiveHeadersStart - response.timing.sendEnd,
+                        timings: this.all_times ? response.timing : null
                     });
                 }
-                console.log("O tempo para o primeiro byte da url " + url + " foi de " + serverProcessingTime);
+                console.log("O tempo para o primeiro byte da url " + response.url + " foi de " + (response.timing.receiveHeadersStart - response.timing.sendEnd));
                 logger.info('Gravando tempo de resposta:', { url });
                 logger.info('O tempo de resposta do servidor foi:', { serverProcessingTime });
             }
@@ -152,6 +196,9 @@ class AnalyzerAgentPlugin {
             console.log("\n\n");
             const novoJsonString = JSON.stringify(this.resultadoJson, null, 2); // O terceiro argumento é para formatar a saída
             fs.writeFileSync(this.resultadoPath, novoJsonString);
+            if(this.browser){
+                this.browser.close();
+            }
         });
 	}
 

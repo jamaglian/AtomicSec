@@ -1,7 +1,7 @@
 import fs from 'fs';
-import scrape from 'website-scraper'; 
 import {config} from './Utils/config.js';
 import {ResultHelper} from './Utils/result_helper.js'; 
+import Scraper from './website-scraper/lib/scraper.js'; 
 import {testAndParseArguments} from './Utils/process-arguments.js'; 
 
 /**
@@ -23,7 +23,8 @@ const resultHelper = new ResultHelper();
 /**
  * Scrape
  */
-await scrape(config.constructScrapeConfig());
+await new Scraper(config.constructScrapeConfig()).scrape()
+//await scrape(config.constructScrapeConfig());
 /*
 const resulta = await scrape(options);
 const resultb = await scrape(options);
