@@ -10,6 +10,7 @@ const img_extensions = [
     ".bmp",
     ".svg",
     ".webp",
+    ".ico",
     // Adicione outras extensões de imagem aqui, se necessário
 ];
 

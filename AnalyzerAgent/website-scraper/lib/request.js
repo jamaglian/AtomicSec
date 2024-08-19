@@ -97,8 +97,10 @@ async function getRequest ({url, referer, options = {}, afterResponse = defaultR
 		// Listen to the 'response' event but store the values for later use
 		requestOptions.puppeteerPage.on('response', (response) => {
 			if (response.url() === url) {
-			mimeType = response.headers()['content-type'].split(';')[0];
-			statusCode = response.status();
+				if(response.headers()['content-type']){
+					mimeType = response.headers()['content-type'].split(';')[0];
+				}
+				statusCode = response.status();
 			}
 		});
 	
