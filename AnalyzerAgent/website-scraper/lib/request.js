@@ -104,9 +104,9 @@ async function getRequest ({url, referer, options = {}, afterResponse = defaultR
 	
 		requestOptions.puppeteerPage.on('requestfinished', async (request) => {
 			if (request.url() === url) {
-			const response = request.response();
-			timing = JSON.parse(JSON.stringify(response.timing()));
-			//console.log(`Timing: ${JSON.stringify(timing)}`);
+				const response = await request.response();
+				timing = JSON.parse(JSON.stringify(response.timing()));
+				//console.log(`Timing: ${JSON.stringify(timing)}`);
 			}
 		});
 

@@ -22,7 +22,7 @@
                     <thead>
                         <tr>
                             <th>Link</th>
-                            <th>Tempo Médio</th>
+                            <th>Tempo Médio (ms)</th>
                             <th>Tempo Por Rodada</th>
                         </tr>
                     </thead>
@@ -30,7 +30,7 @@
                         @foreach($links_encontrados as $key => $links)
                         <tr>
                             <td>{{$key}}</td>
-                            <td>{{$links->media}}ms</td>
+                            <td>{{$links->media}}</td>
                             <td>
                                 @foreach($links->times as $key => $time)
                                     <dd><b>{{$key + 1}}:</b> {{$time->serverProcessingTime}}ms </dd>

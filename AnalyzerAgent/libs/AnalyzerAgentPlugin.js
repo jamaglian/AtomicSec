@@ -153,22 +153,24 @@ class AnalyzerAgentPlugin {
                     logger.info('O tempo de resposta do servidor foi:', { serverProcessingTime });
                 }
             }else{
-                if(this.serverRequestTimeMap[url] !== undefined){
-                    this.serverRequestTimeMap[url].times.push({ 
-                        serverProcessingTime: response.timing.receiveHeadersStart - response.timing.sendEnd,
-                        timings: this.all_times ? response.timing : null
-                    });
-                }else{
-                    this.serverRequestTimeMap[url] = {}
-                    this.serverRequestTimeMap[url].times = [];
-                    this.serverRequestTimeMap[url].times.push({ 
-                        serverProcessingTime: response.timing.receiveHeadersStart - response.timing.sendEnd,
-                        timings: this.all_times ? response.timing : null
-                    });
+                if (typeof response.timing.receiveHeadersStart === 'number' && typeof response.timing.sendEnd === 'number') {
+                    if(this.serverRequestTimeMap[url] !== undefined){
+                        this.serverRequestTimeMap[url].times.push({ 
+                            serverProcessingTime: response.timing.receiveHeadersStart - response.timing.sendEnd,
+                            timings: this.all_times ? response.timing : null
+                        });
+                    }else{
+                        this.serverRequestTimeMap[url] = {}
+                        this.serverRequestTimeMap[url].times = [];
+                        this.serverRequestTimeMap[url].times.push({ 
+                            serverProcessingTime: response.timing.receiveHeadersStart - response.timing.sendEnd,
+                            timings: this.all_times ? response.timing : null
+                        });
+                    }
+                    console.log("O tempo para o primeiro byte da url " + response.url + " foi de " + (response.timing.receiveHeadersStart - response.timing.sendEnd));
+                    logger.info('Gravando tempo de resposta:', { url });
+                    logger.info('O tempo de resposta do servidor foi:', { serverProcessingTime });
                 }
-                console.log("O tempo para o primeiro byte da url " + response.url + " foi de " + (response.timing.receiveHeadersStart - response.timing.sendEnd));
-                logger.info('Gravando tempo de resposta:', { url });
-                logger.info('O tempo de resposta do servidor foi:', { serverProcessingTime });
             }
             return response;
         });
