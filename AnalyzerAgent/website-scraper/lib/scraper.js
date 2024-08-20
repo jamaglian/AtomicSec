@@ -150,7 +150,8 @@ class Scraper {
 						url,
 						referer,
 						options: requestOptions,
-						afterResponse: this.actions.afterResponse.length ? this.runActions.bind(this, 'afterResponse') : undefined
+						afterResponse: this.actions.afterResponse.length ? this.runActions.bind(this, 'afterResponse') : undefined,
+						urlFilter: this.options.urlFilter ? this.options.urlFilter : undefined
 					});
 				});
 			}).then(async function requestCompleted (responseData) {

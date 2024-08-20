@@ -20,6 +20,8 @@ class Config {
             "result_model": {
                 "possibleCMS": false,
                 "possibleCMSType": '',
+                "behindWAF": false,
+                'behindWAFType': '',
                 "serverRequestTimeMap": {},
                 "run": 1
             },

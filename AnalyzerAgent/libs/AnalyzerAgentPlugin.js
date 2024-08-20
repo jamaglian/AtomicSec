@@ -50,6 +50,12 @@ class AnalyzerAgentPlugin {
         this.possibleCMSVerison = '';
 
         /**
+         * Waf Verifications
+         */
+        this.behindWAF = false;
+        this.behindWAFType = '';
+
+        /**
          * Puppeteer
          */
         this.use_puppeteer = !useGot;
@@ -168,6 +174,10 @@ class AnalyzerAgentPlugin {
                             timings: this.all_times ? response.timing : null
                         });
                     }
+                    if(response.wafEvidence){
+                        this.behindWAF = true;
+                        this.behindWAFType = response.behindWAFType;
+                    }
                     console.log("O tempo para o primeiro byte da url " + response.url + " foi de " + (response.timing.receiveHeadersStart - response.timing.sendEnd));
                     logger.info('Gravando tempo de resposta:', { url });
                     logger.info('O tempo de resposta do servidor foi:', { serverProcessingTime });
@@ -180,6 +190,8 @@ class AnalyzerAgentPlugin {
             this.resultadoJson.run = this.resultadoJson.run + 1;
             this.resultadoJson.possibleCMSType = this.possibleCMSType;
             this.resultadoJson.serverRequestTimeMap = this.serverRequestTimeMap;
+            this.resultadoJson.behindWAF = this.behindWAF;
+            this.resultadoJson.behindWAFType = this.behindWAFType;
             var topValores = []; // array para armazenar os top 3 valores e URLs correspondentes
 
             Object.keys(this.resultadoJson.serverRequestTimeMap).forEach(index => {

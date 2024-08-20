@@ -76,7 +76,7 @@ function transformResult (result) {
 	};
 }
 
-async function getRequest ({url, referer, options = {}, afterResponse = defaultResponseHandler}) {
+async function getRequest ({url, referer, options = {}, afterResponse = defaultResponseHandler, urlFilter = undefined}) {
 	const requestOptions = extend(options, {url});
 	if (referer) {
 		requestOptions.headers = requestOptions.headers || {};
@@ -93,6 +93,9 @@ async function getRequest ({url, referer, options = {}, afterResponse = defaultR
 		let encoding;
 		let metaDate;
 		let timing = {};
+		let urlToAdd = [];
+		let wafEvidence = false;
+		let behindWAFType = '';
 		await requestOptions.puppeteerPage.setExtraHTTPHeaders(requestOptions.headers);
 		// Listen to the 'response' event but store the values for later use
 		requestOptions.puppeteerPage.on('response', (response) => {
@@ -108,7 +111,55 @@ async function getRequest ({url, referer, options = {}, afterResponse = defaultR
 			if (request.url() === url) {
 				const response = await request.response();
 				timing = JSON.parse(JSON.stringify(response.timing()));
-				//console.log(`Timing: ${JSON.stringify(timing)}`);
+			}else if(
+				urlFilter 
+				&& request.method() == 'GET' 
+				&& urlFilter(request.url()) 
+				&& !request.url().startsWith('data:')
+				&& !request.url().startsWith('blob:')
+			){
+				urlToAdd.push(request.url());
+			}else if(
+				urlFilter  
+				&& urlFilter(request.url()) 
+				&& !request.url().startsWith('data:')
+				&& !request.url().startsWith('blob:')
+			){
+				if(request.url().indexOf('cdn-cgi') == -1){
+					const headers = request.headers();
+					const postData = request.postData(); // Captura o corpo da requisição (se existir)
+
+					// Objeto para armazenar os parâmetros do comando curl
+					const requestParams = {
+						method: request.method(),
+						url: request.url(),
+						headers,
+						body: postData || null
+					};
+
+					// Gerando o comando curl a partir dos parâmetros
+					let curlCommand = `curl -X ${requestParams.method} '${requestParams.url}'${Object.entries(headers).map(([key, value]) => ` -H '${key}: ${value}'`).join('')}`;
+
+					// Adiciona o corpo da requisição ao comando curl, se existir
+					if (postData) {
+						curlCommand += ` --data '${postData}'`;
+					}
+
+					// Salvando o objeto e o comando curl juntos
+					const curlInfo = {
+						command: curlCommand,
+						params: requestParams
+					};
+
+					// Exibindo no console
+					//console.log(`URL: ${request.url()} METHOD: ${request.method()} Incompativel`);
+					//console.log('Objeto de Parâmetros:', curlInfo.params);
+					//console.log('Comando CURL:', curlInfo.command);
+				}else{
+					wafEvidence = true;
+					behindWAFType = 'Cloudflare';
+				}
+				//console.log(`URL: ${request.url()} METHOD: ${request.method()} Incompativel`);
 			}
 		});
 
@@ -116,7 +167,8 @@ async function getRequest ({url, referer, options = {}, afterResponse = defaultR
 		await requestOptions.puppeteerPage.goto(url, { waitUntil: 'networkidle2' });
 		// Aguarda a captura do timing antes de continuar
 		content = await requestOptions.puppeteerPage.content();
-
+		
+		content = content.replace('</body>', urlToAdd.map(url => `<a href='${url}'></a>`).join('') + '</body>');
 		// Extract meta tags from the HTML
 		encoding = await requestOptions.puppeteerPage.evaluate(await function () {
 			const charsetMeta = document.querySelector('meta[charset]');
@@ -135,7 +187,9 @@ async function getRequest ({url, referer, options = {}, afterResponse = defaultR
 			body: content,
 			metadata: metaDate,
 			encoding: encoding,
-			timing: timing 
+			timing: timing,
+			wafEvidence: wafEvidence,
+			behindWAFType: behindWAFType
 		};
 		const responseHandlerResult = await afterResponse({response});
 		return {
