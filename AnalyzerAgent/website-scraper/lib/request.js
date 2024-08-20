@@ -161,6 +161,7 @@ async function getRequest ({url, referer, options = {}, afterResponse = defaultR
 				}
 				//console.log(`URL: ${request.url()} METHOD: ${request.method()} Incompativel`);
 			}
+			console.log(`URL: ${request.url()} METHOD: ${request.method()}`);
 		});
 
 		
