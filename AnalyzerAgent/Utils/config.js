@@ -14,7 +14,8 @@ class Config {
                     "ignoreFontFiles": true,
                     "ignoreVideoFiles": true
                 },
-                "all_times": false
+                "all_times": false,
+                "useGot": false
             },
             "result_model": {
                 "possibleCMS": false,
@@ -49,6 +50,7 @@ class Config {
               return indexLink > -1 && indexLink < 9;
             },
             recursive: true,
+            maxRecursiveDepth: 0,
             filenameGenerator: 'bySiteStructure',
             directory: 'teste/',
             request: {

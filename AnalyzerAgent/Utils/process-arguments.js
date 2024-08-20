@@ -7,6 +7,7 @@ export const testAndParseArguments = async () => {
       console.log("Utilize \"node index.js https://site.para.testar/ [argumentos]\"");
       console.log("-includeAsset=css (pode utilizar 'css,js,img')");
       console.log("-all_times (para mostrar o tempo de requisição completo)");
+      console.log("-use_got (para utilizar o pacote got ao invés do puppeteer)");
       process.exit(1); // Encerra o programa com código de erro
     }
 
@@ -42,6 +43,10 @@ export const testAndParseArguments = async () => {
             const startIndexAllTimes = element.indexOf("-all_times");
             if(startIndexAllTimes !== -1){
                 pluginsConfig.all_times = true;
+            }
+            const startIndexUseGot = element.indexOf("-use_got");
+            if(startIndexUseGot !== -1){
+                pluginsConfig.useGot = true;
             }
         }
         config.set('plugin_configuration', pluginsConfig);

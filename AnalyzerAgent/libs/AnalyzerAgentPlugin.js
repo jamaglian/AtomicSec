@@ -26,7 +26,7 @@ class AnalyzerAgentPlugin {
         ignores = {},
         result_filename = 'resultado.json',
         all_times = false,
-        use_puppeteer = true
+        useGot = false
 	} = {}) {
         /**
          * Plugin options
@@ -52,7 +52,7 @@ class AnalyzerAgentPlugin {
         /**
          * Puppeteer
          */
-        this.use_puppeteer = use_puppeteer;
+        this.use_puppeteer = !useGot;
 
         /**
          * Logger
