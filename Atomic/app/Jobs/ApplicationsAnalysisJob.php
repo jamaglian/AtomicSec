@@ -92,6 +92,11 @@ class ApplicationsAnalysisJob implements ShouldQueue, ShouldBeUnique
                             $application->type = $jsonData['possibleCMSType'];
                             $application->save();
                         }
+                        if($jsonData['behindWAF']){
+                            $application = Applications::find($this->applicationsAnalysis->application_id);
+                            $application->waf = $jsonData['behindWAFType'];
+                            $application->save();
+                        }
                         unlink($filePath);
                     } else {
                         $this->applicationsAnalysis->status = 'Erro.';

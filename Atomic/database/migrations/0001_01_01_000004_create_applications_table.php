@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('url');
             $table->string('type')->default('Não definido');
+            $table->string('waf')->default('Não definido');
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();
         });
