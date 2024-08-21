@@ -40,7 +40,7 @@ class Config {
         return this.settings;
     }
 
-    constructScrapeConfig(puppeteer = {}) {
+    constructScrapeConfig(resultHelper) {
         
         const url_scrape = this.settings['url_scrape'];
         const result_filename = this.settings['result_filename'];
@@ -59,7 +59,6 @@ class Config {
               headers: {
                 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'
               },
-              //...puppeteer
               /* ,
               agent: {
                 https: new HttpsProxyAgent({
@@ -76,6 +75,7 @@ class Config {
               new AnalyzerAgentPlugin({
                 launchOptions: {  },
                 ...this.settings['plugin_configuration'],
+                resultHelper: resultHelper,
                 result_filename: result_filename
               })
             ]

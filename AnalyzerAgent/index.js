@@ -23,7 +23,7 @@ const resultHelper = new ResultHelper();
 /**
  * Scrape
  */
-await new Scraper(config.constructScrapeConfig()).scrape()
+await new Scraper(config.constructScrapeConfig(resultHelper)).scrape()
 //await scrape(config.constructScrapeConfig());
 /*
 const resulta = await scrape(options);
