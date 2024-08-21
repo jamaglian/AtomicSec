@@ -96,6 +96,7 @@ async function getRequest ({url, referer, options = {}, afterResponse = defaultR
 		let urlToAdd = [];
 		let wafEvidence = false;
 		let behindWAFType = '';
+		let postCalls = {};
 		await requestOptions.puppeteerPage.setExtraHTTPHeaders(requestOptions.headers);
 		// Listen to the 'response' event but store the values for later use
 		requestOptions.puppeteerPage.on('response', (response) => {
@@ -147,28 +148,25 @@ async function getRequest ({url, referer, options = {}, afterResponse = defaultR
 
 					// Salvando o objeto e o comando curl juntos
 					const curlInfo = {
-						command: curlCommand,
+						//command: curlCommand,
 						params: requestParams
 					};
-
+					postCalls[request.url()] = curlInfo;
 					// Exibindo no console
-					//console.log(`URL: ${request.url()} METHOD: ${request.method()} Incompativel`);
-					//console.log('Objeto de Parâmetros:', curlInfo.params);
-					//console.log('Comando CURL:', curlInfo.command);
+					/*console.log(`URL: ${request.url()} METHOD: ${request.method()} Incompativel`);
+					console.log('Objeto de Parâmetros:', curlInfo.params);
+					console.log('Comando CURL:', curlInfo.command);*/
 				}else{
 					wafEvidence = true;
 					behindWAFType = 'Cloudflare';
 				}
-				//console.log(`URL: ${request.url()} METHOD: ${request.method()} Incompativel`);
 			}
-			console.log(`URL: ${request.url()} METHOD: ${request.method()}`);
 		});
 
 		
 		await requestOptions.puppeteerPage.goto(url, { waitUntil: 'networkidle2' });
 		// Aguarda a captura do timing antes de continuar
 		content = await requestOptions.puppeteerPage.content();
-		
 		content = content.replace('</body>', urlToAdd.map(url => `<a href='${url}'></a>`).join('') + '</body>');
 		// Extract meta tags from the HTML
 		encoding = await requestOptions.puppeteerPage.evaluate(await function () {
@@ -190,7 +188,8 @@ async function getRequest ({url, referer, options = {}, afterResponse = defaultR
 			encoding: encoding,
 			timing: timing,
 			wafEvidence: wafEvidence,
-			behindWAFType: behindWAFType
+			behindWAFType: behindWAFType,
+			postCalls: postCalls
 		};
 		const responseHandlerResult = await afterResponse({response});
 		return {

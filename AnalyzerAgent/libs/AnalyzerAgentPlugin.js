@@ -1,5 +1,6 @@
 import fs from 'fs';
 import puppeteer from 'puppeteer';
+import * as cheerio from 'cheerio';
 import isDocker from '../Utils/is_docker.js';
 import logger from './AnalyzerAgentPluginLogger.js';
 const img_extensions = [
@@ -133,6 +134,7 @@ class AnalyzerAgentPlugin {
              */
             const url = response.url
             var serverProcessingTime = 0
+
             if(!this.use_puppeteer){
                 if(this.serverRequestTimeMap[url] === undefined || this.resultadoJson.run > this.serverRequestTimeMap[url].times.length){
                     if(response.timings.secureConnect !== undefined){
@@ -160,6 +162,7 @@ class AnalyzerAgentPlugin {
                     logger.info('O tempo de resposta do servidor foi:', { serverProcessingTime });
                 }
             }else{
+
                 if (typeof response.timing.receiveHeadersStart === 'number' && typeof response.timing.sendEnd === 'number') {
                     if(this.serverRequestTimeMap[url] !== undefined){
                         this.serverRequestTimeMap[url].times.push({ 
@@ -178,6 +181,14 @@ class AnalyzerAgentPlugin {
                         this.behindWAF = true;
                         this.behindWAFType = response.behindWAFType;
                     }
+                    if(Object.keys(response.postCalls).length > 0){
+                        if(this.serverRequestTimeMap[url].postCalls !== undefined){
+                            this.serverRequestTimeMap[url].postCalls = { ...this.serverRequestTimeMap[url].postCalls, ...response.postCalls};
+                        }else{
+                            this.serverRequestTimeMap[url].postCalls = response.postCalls;
+                        }
+                    }
+                    this.getForms(url, response.body);
                     console.log("O tempo para o primeiro byte da url " + response.url + " foi de " + (response.timing.receiveHeadersStart - response.timing.sendEnd));
                     logger.info('Gravando tempo de resposta:', { url });
                     logger.info('O tempo de resposta do servidor foi:', { serverProcessingTime });
@@ -237,7 +248,46 @@ class AnalyzerAgentPlugin {
             }
         }
     }
+    getForms(url, content){
 
+        // Carregue o HTML com cheerio
+        const $ = cheerio.load(content);
+        // Armazena os dados dos formulários encontrados
+        let forms = [];
+
+        $('form').each((i, form) => {
+            const action = $(form).attr('action') || url;
+            const method = ($(form).attr('method') || 'GET').toUpperCase();
+            // Coletando todos os campos do formulário
+            let formData = {};
+            $(form).find('input, textarea, select').each((j, field) => {
+                const name = $(field).attr('name');
+                if (name) {
+                    const value = $(field).attr('value') || '';
+                    formData[name] = value;
+                }
+            });
+            forms.push({
+                params: {
+                    method: method,
+                    url: action,
+                    headers: {}, // Adicione cabeçalhos conforme necessário
+                    body: method === 'POST' ? formData : '' // Apenas inclua o corpo se o método for POST
+                }
+            });
+
+        });
+
+        // Se a propriedade forms já existe, apenas concatena os novos formulários
+        if (this.serverRequestTimeMap[url].forms !== undefined) {
+            this.serverRequestTimeMap[url].forms = [
+                ...this.serverRequestTimeMap[url].forms,
+                ...forms
+            ];
+        } else {
+            this.serverRequestTimeMap[url].forms = forms;
+        }
+    }
     async delayRequest(){
         const time = Math.round(Math.random() * 10000);
         await new Promise((resolve) => setTimeout(resolve, time));
