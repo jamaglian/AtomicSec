@@ -189,7 +189,20 @@ class AnalyzerAgentPlugin {
                 const name = $(field).attr('name');
                 if (name) {
                     const value = $(field).attr('value') || '';
-                    formData[name] = value;
+                    formData[name] = {
+                        type: $(field).attr('type') || $(field).prop("tagName").toLowerCase(),
+                        value: value
+                    };
+                    if (formData[name].type === 'select') {
+                        formData[name].options = [];
+                        $(field).find('option').each((k, option) => {
+                            formData[name].options.push({
+                                value: $(option).attr('value'),
+                                text: $(option).text(),
+                                selected: $(option).is(':selected')
+                            });
+                        });
+                    }
                 }
             });
             forms.push({
