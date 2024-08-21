@@ -272,7 +272,7 @@ class AnalyzerAgentPlugin {
                     method: method,
                     url: action,
                     headers: {}, // Adicione cabeçalhos conforme necessário
-                    body: method === 'POST' ? formData : '' // Apenas inclua o corpo se o método for POST
+                    formData: formData
                 }
             });
 
