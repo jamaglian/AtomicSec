@@ -19,7 +19,8 @@ class Applications extends Model
         'company_id',
         'name',
         'url',
-        'type'
+        'type',
+        'waf'
     ];
     /**
      * Get the companies associated with the application.

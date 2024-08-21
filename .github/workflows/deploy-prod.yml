@@ -79,12 +79,6 @@ jobs:
               --exclude='vendor' \
               --include='storage/framework' \
               --exclude='storage/*' \
-              --include='public/.htaccess' \
-              --include='public/favicon.ico' \
-              --include='public/index.php' \
-              --include='public/images' \
-              --include='public/build' \
-              --exclude='public/*' \
               --exclude='.env' \
               /home/runner/work/AtomicSec/AtomicSec/Atomic/ producao-host:/var/www/atomic.sec/producao/
 

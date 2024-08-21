@@ -42,7 +42,7 @@ class ApplicationsAnalysisJob implements ShouldQueue, ShouldBeUnique
         $this->applicationsAnalysis->status = 'Rodando...';
         $this->applicationsAnalysis->save(); // Save log in real-time
         // Command to start Docker container (Argumento t removido)
-        $dockerCommand = "docker run -i -v " . env('CACHE_DATA_PATH', 'atomic_shared_vol') . ":/home/node/app/result --rm analyzeragent:" . ((env('CACHE_DATA_PATH', 'PRODUCAO') == 'PRODUCAO')? 'latest':'dev') ." node index.js {$this->applicationsAnalysis->application->url} --result_filename=". str_replace('.', '_', $this->getDomain($this->applicationsAnalysis->application->url));
+        $dockerCommand = "docker run -i -v " . env('CACHE_DATA_PATH', 'atomic_shared_vol') . ":/home/node/app/result --rm analyzeragent:" . ((env('RUNNING_SERVER', 'PRODUCAO') == 'PRODUCAO')? 'latest':'dev') ." node index.js {$this->applicationsAnalysis->application->url} --result_filename=". str_replace('.', '_', $this->getDomain($this->applicationsAnalysis->application->url));
         // Open a pipe to the Docker process
         $process = proc_open($dockerCommand, [1 => ['pipe', 'w']], $pipes);
 
@@ -90,6 +90,11 @@ class ApplicationsAnalysisJob implements ShouldQueue, ShouldBeUnique
                         if($jsonData['possibleCMS']){
                             $application = Applications::find($this->applicationsAnalysis->application_id);
                             $application->type = $jsonData['possibleCMSType'];
+                            $application->save();
+                        }
+                        if($jsonData['behindWAF']){
+                            $application = Applications::find($this->applicationsAnalysis->application_id);
+                            $application->waf = $jsonData['behindWAFType'];
                             $application->save();
                         }
                         unlink($filePath);

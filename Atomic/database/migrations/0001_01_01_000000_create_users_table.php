@@ -34,6 +34,14 @@ return new class extends Migration
                 'remember_token' => Str::random(10),
                 'global_admin' => 1,
             ]);
+            User::create([
+                'name' => 'Teste',
+                'email' => 'teste@atomicsec.com.br',
+                'email_verified_at' => now(),
+                'password' => Hash::make('12345678'),
+                'remember_token' => Str::random(10),
+                'global_admin' => 0,
+            ]);
         });
         Schema::create('password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();

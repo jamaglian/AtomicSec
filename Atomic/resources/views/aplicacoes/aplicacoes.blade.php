@@ -23,6 +23,7 @@
                                 <th>Nome</th>
                                 <th>URL</th>
                                 <th>Tipo</th>
+                                <th>WAF</th>
                                 <th>Ultima Analize</th>
                                 <th>Ações</th>
                             </tr>
@@ -33,6 +34,7 @@
                                 <td>{{ $aplication->name }}</td>
                                 <td>{{ $aplication->url }}</td>
                                 <td>{{ $aplication->type }}</td>
+                                <td>{{ $aplication->waf }}</td>
                                 @if($aplication->analysis->isNotEmpty() && $aplication->analysis->sortByDesc('created_at')->first()->finish_at)
                                     <td>{{ \Carbon\Carbon::parse($aplication->analysis->sortByDesc('created_at')->first()->finish_at)->setTimezone('America/Sao_Paulo')->format('d/m/Y H:i:s') }}</td>
                                 @else

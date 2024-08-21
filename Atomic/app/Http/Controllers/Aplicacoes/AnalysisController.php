@@ -53,7 +53,7 @@ class AnalysisController extends Controller
                 $allAnalyses[] = $analysis;
             }
         }
-        return view('analises/analises', [
+        return view('atomicsec.dashboard.analises.index', [
             "company"      => $this->empresa,
             "applications" => $this->empresa->applications,
             "analises"     => $allAnalyses
@@ -67,7 +67,7 @@ class AnalysisController extends Controller
      */
     public function cadastrof(Request $request): View
     {
-        return view('analises/cadastrar', [
+        return view('atomicsec.dashboard.analises.cadastrar', [
             "company"      => $this->empresa,
             "applications" => $this->empresa->applications,
         ]);
@@ -114,7 +114,7 @@ class AnalysisController extends Controller
             return redirect(route('analysis.index', absolute: false))->with('error', __('Você não tem permissão para acessar essa análise.'));
         }
         $analysis_data = json_decode($analysis->analysis);
-        return view('analises/analise', [
+        return view('atomicsec.dashboard.analises.analise', [
             "analise"                => $analysis,
             "links_encontrados"      => ((isset($analysis_data->serverRequestTimeMap))?$analysis_data->serverRequestTimeMap:null),
         ]);
