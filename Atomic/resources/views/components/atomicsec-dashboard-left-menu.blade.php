@@ -30,6 +30,7 @@
                         (
                             ( 
                                 request()->routeIs('gadmin_companies.list')
+                                || request()->routeIs('gadmin_proxys.index')
                             )? 
                                 'class="list-unstyled collapse show"' :
                                 'class="list-unstyled collapse"' 
@@ -38,6 +39,7 @@
                     class="list-unstyled collapse"
                 >
                     <li><a href="{{route('gadmin_companies.list')}}">{{ __('Empresas') }}</a></li>
+                    <li><a href="{{route('gadmin_proxys.index')}}">{{ __('Proxys') }}</a></li>
                 </ul>
             </li>
         @endif
