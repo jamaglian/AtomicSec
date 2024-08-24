@@ -61,19 +61,14 @@ class ProxyController extends Controller
                 continue; // Pular IPs inválidos
             }
         
-            // Criar ou atualizar o proxy, evitando duplicatas com base no par IP, porta e tipo
-            Proxy::updateOrCreate(
+            Proxy::firstOrCreate(
                 [
                     'ip' => $ip,
                     'port' => $port,
-                    'type' => $type,
-                ],
-                [
-                    'working' => false, // Definindo como falso inicialmente
-                    'working_waf' => false,
-                    'tested_at' => null,
+                    'type' => $type
                 ]
             );
+            
         }
 
         return redirect()->route('proxys.index')->with('success', 'Proxies importados com sucesso!');
