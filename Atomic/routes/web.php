@@ -3,10 +3,10 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Aplicacoes\AttacksController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\Aplicacoes\AnalysisController;
 use App\Http\Controllers\Aplicacoes\AplicacoesController;
-
 
 Route::get('/', function () {
     return view('index');
@@ -30,6 +30,11 @@ Route::middleware('auth')->group(function () {
             Route::post('/cadastrar', [AnalysisController::class, 'cadastro'])->name('analysis.cadastro');
             Route::get('/{id}', [AnalysisController::class, 'analise'])->name('analysis.analise');
         });
+        Route::prefix('ataques')->group(function () {
+            Route::get('/http-keep-alive', [AttacksController::class, 'http_keep_alive_index'])->name('ataques.http-keep-alive');
+            Route::get('/http-keep-alive/cadastrar', [AttacksController::class, 'http_keep_alive_cadastrof'])->name('ataques.http-keep-alive.cadratrof');
+            Route::post('/http-keep-alive/cadastrar', [AttacksController::class, 'http_keep_alive_cadastro'])->name('ataques.http-keep-alive.cadastro');
+        });  
     });
 });
 
