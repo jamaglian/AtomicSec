@@ -44,7 +44,7 @@ class AttackHttpKeepAliveJob implements ShouldQueue
             $this->applicationsAttack->save(); // Salva o log em tempo real
             $params = json_decode($this->applicationsAttack->attack_params, true);
             // Comando para iniciar o container Docker
-            $attackCommand = env('ATTACKS_DATA_PATH', '/var/www/html/storage/attacks/') . "HTTP_Keep_Alive -url={$this->applicationsAttack->application->url} -threads={$params['atacantes']} -process-timeout={$params['tempo']}";
+            $attackCommand = env('ATTACKS_DATA_PATH', '/var/www/html/bin/attacks/') . "HTTP_Keep_Alive -url={$this->applicationsAttack->application->url} -threads={$params['atacantes']} -process-timeout={$params['tempo']}";
             // Abre um pipe para o processo Docker
             $process = proc_open($attackCommand, [1 => ['pipe', 'w']], $pipes);
 

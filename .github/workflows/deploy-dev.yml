@@ -68,10 +68,10 @@ jobs:
     - name: Build and set up HTTP Keep Alive Attack
       run: |
         sudo apt install golang-go
-        mkdir /home/runner/work/AtomicSec/AtomicSec/Atomic/storage/attacks
+        mkdir -p /home/runner/work/AtomicSec/AtomicSec/Atomic/bin/attacks
         cd /home/runner/work/AtomicSec/AtomicSec/Attacks/HTTP_Keep-Alive/
         GOOS=linux GOARCH=amd64 go build -o HTTP_Keep_Alive
-        cp ./HTTP_Keep_Alive /home/runner/work/AtomicSec/AtomicSec/Atomic/storage/attacks/
+        cp ./HTTP_Keep_Alive /home/runner/work/AtomicSec/AtomicSec/Atomic/bin/attacks/
 
     - name: Web platform sync files
       run: |
@@ -86,7 +86,6 @@ jobs:
               --exclude='node_modules' \
               --exclude='vendor' \
               --include='storage/framework' \
-              --include='storage/attacks' \
               --exclude='storage/*' \
               --exclude='.env' \
               /home/runner/work/AtomicSec/AtomicSec/Atomic/ desenvolvimento-host:/var/www/atomic.sec/dev/
@@ -107,7 +106,7 @@ jobs:
         ssh desenvolvimento-host "sudo chown www-data:www-data -R /var/www/atomic.sec/dev/"
         ssh desenvolvimento-host "sudo chmod 775 -R /var/www/atomic.sec/dev/"
         #Setup attack permissions
-        ssh desenvolvimento-host "sudo chmod +x -R /var/www/atomic.sec/dev/storage/attacks/HTTP_Keep_Alive"
+        ssh desenvolvimento-host "sudo chmod +x -R /var/www/atomic.sec/dev/bin/attacks/HTTP_Keep_Alive"
 
     - name: Setup again
       if: ${{ github.event.inputs.fresh-deploy == 'true' }}
@@ -122,5 +121,5 @@ jobs:
         ssh desenvolvimento-host "sudo chown www-data:www-data -R /var/www/atomic.sec/dev/"
         ssh desenvolvimento-host "sudo chmod 775 -R /var/www/atomic.sec/dev/"
         #Setup attack permissions
-        ssh desenvolvimento-host "sudo chmod +x -R /var/www/atomic.sec/dev/storage/attacks/HTTP_Keep_Alive"
+        ssh desenvolvimento-host "sudo chmod +x -R /var/www/atomic.sec/dev/bin/attacks/HTTP_Keep_Alive"
         ssh desenvolvimento-host "sudo systemctl restart dev_laravel_worker.service"
