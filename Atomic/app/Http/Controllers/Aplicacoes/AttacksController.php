@@ -38,6 +38,23 @@ class AttacksController extends Controller
         }
     }
     /**
+    * Apaga um ataque.
+    *
+    * @param Request $request A requisição HTTP recebida.
+    * @return RedirectResponse Uma resposta de redirecionamento, se aplicável.
+    */
+    public function delete($id): RedirectResponse
+    {
+        $attack = ApplicationAttack::findOrFail($id);
+        $aplication = Applications::findOrFail($attack->application_id);
+        if($this->empresa->id != $aplication->company_id) {
+            return redirect(route('dashboard', absolute: false))->with('error', __('Você não tem permissão para deletar esse ataque.'));
+        }
+        $attack_type = $attack->attacks_types_id;
+        $attack->delete();
+        return redirect(route((($attack_type == 1)? 'ataques.http-keep-alive' : 'dashboard'), absolute: false))->with('success', __('Ataque deletado com sucesso.'));
+    }
+    /**
      * Exibe os ataques HTTP Keep alive da empresa.
      *
      * @param Request $request A requisição HTTP recebida.
@@ -83,7 +100,8 @@ class AttacksController extends Controller
         $request->validate([
             'aplicacao' => ['required', 'int'],
             'atacantes' => ['required', 'int'],
-            'use_proxy' => ['required', 'in:yes,no']
+            'use_proxy' => ['required', 'in:yes,no'],
+            'tempo'     => ['required', 'string', 'max:5'],
         ]);
         $applications = $this->empresa->applications;
 
@@ -92,12 +110,42 @@ class AttacksController extends Controller
         if(!$aplication) {
             throw new \Exception(__("A aplicação não foi encontrada."));
         }
+        if($aplication->waf != 'Não definido' || $request->use_proxy == 'yes') {
+            return redirect(route('ataques.http-keep-alive', absolute: false))->with('fail', __('Ataque cadastrado e adicionado a fila de execução com sucesso.'));
+            //throw new \Exception(__("Atualmente não temos proxy. Não é possível realizar o ataque."));
+        }
 
         $atacar = ApplicationAttack::create([
             'application_id'    => $request->aplicacao,
-            'attacks_types_id'  => 1
+            'attacks_types_id'  => 1,
+            'attack_params'     => json_encode([
+                'atacantes' => $request->atacantes,
+                'tempo'     => $request->tempo,
+                'use_proxy' => $request->use_proxy,
+            ])
         ]);
         AttackHttpKeepAliveJob::dispatch($atacar);
         return redirect(route('ataques.http-keep-alive', absolute: false))->with('success', __('Ataque cadastrado e adicionado a fila de execução com sucesso.'));
+    }   
+        /**
+     * Exibe a página de informações do ataque HTTP Keep alive.
+     *
+     * @param Request $request A requisição HTTP recebida.
+     * @return View Uma resposta de visualização para o formulário de cadastro de empresas.
+     */
+    public function http_keep_alive_attack($id): View
+    {
+        $attack = ApplicationAttack::findOrFail($id);
+        if($attack->attacks_types_id == 1) {
+            $aplication = Applications::findOrFail($attack->application_id);
+            if($this->empresa->id != $aplication->company_id) {
+                return redirect(route('ataques.http-keep-alive', absolute: false))->with('fail', __('Você não tem permissão para acessar esse ataque.'));
+            }
+            return view('atomicsec.dashboard.attacks.http-keep-alive.ataque', [
+                "attack"                => $attack
+            ]);
+        }else{
+            return redirect(route('ataques.http-keep-alive', absolute: false))->with('fail', __('Ataque não correspondente.'));
+        }
     }
 }

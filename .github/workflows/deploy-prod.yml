@@ -65,6 +65,14 @@ jobs:
         scp ./analyzeragent-latest.tar producao-host:~/analyzeragent-latest.tar
         ssh producao-host "docker load -i ~/analyzeragent-latest.tar && rm ~/analyzeragent-latest.tar"
 
+    - name: Build and set up HTTP Keep Alive Attack
+      run: |
+        sudo apt install golang-go
+        mkdir /home/runner/work/AtomicSec/AtomicSec/Atomic/storage/attacks
+        cd /home/runner/work/AtomicSec/AtomicSec/Attacks/HTTP_Keep-Alive/
+        GOOS=linux GOARCH=amd64 go build -o HTTP_Keep_Alive
+        cp ./HTTP_Keep_Alive /home/runner/work/AtomicSec/AtomicSec/Atomic/storage/attacks/
+
     - name: Web platform sync files
       run: |
         rsync -z \
@@ -89,14 +97,16 @@ jobs:
       run: |
         #Setup .env
         echo "$ENV_PRODUCAO" > env_producao
-        ssh desenvolvimento-host "rm /var/www/atomic.sec/producao/.env"
+        ssh producao-host "rm /var/www/atomic.sec/producao/.env"
         scp ./env_producao producao-host:/var/www/atomic.sec/producao/.env
         rm ./env_producao
         #Install composer dependencies
         ssh producao-host "cd /var/www/atomic.sec/producao/ && composer install --no-dev --optimize-autoloader"
         #set permissions
-        ssh producao-host "sudo chown www-data:www-data -R /var/www/atomic.sec/producao/"
-        ssh producao-host "sudo chmod 775 -R /var/www/atomic.sec/producao/"
+        ssh producao-host "sudo chown www-data:www-data -R /var/www/atomic.sec/dev/"
+        ssh producao-host "sudo chmod 775 -R /var/www/atomic.sec/dev/"
+        #Setup attack permissions
+        ssh producao-host "sudo chmod +x -R /var/www/atomic.sec/dev/storage/attacks/HTTP_Keep_Alive"
 
     - name: Setup again
       if: ${{ github.event.inputs.fresh-deploy == 'true' }}
@@ -107,4 +117,9 @@ jobs:
         ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan view:cache"
         ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan storage:link"
         ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan queue:restart"
+        #set permissions
+        ssh producao-host "sudo chown www-data:www-data -R /var/www/atomic.sec/dev/"
+        ssh producao-host "sudo chmod 775 -R /var/www/atomic.sec/dev/"
+        #Setup attack permissions
+        ssh producao-host "sudo chmod +x -R /var/www/atomic.sec/dev/storage/attacks/HTTP_Keep_Alive"
         ssh producao-host "sudo systemctl restart prod_laravel_worker.service"

@@ -120,7 +120,7 @@ class ApplicationsAnalysisJob implements ShouldQueue, ShouldBeUnique
                 $this->applicationsAnalysis->save(); // Save log in real-time
                 $this->fail('Falha ao iniciar o processo Docker.');
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->applicationsAnalysis->status = 'Erro.';
             $this->applicationsAnalysis->save();
             $this->fail('O trabalho falhou com a exceção: ' . $e->getMessage());

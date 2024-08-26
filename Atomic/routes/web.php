@@ -31,9 +31,11 @@ Route::middleware('auth')->group(function () {
             Route::get('/{id}', [AnalysisController::class, 'analise'])->name('analysis.analise');
         });
         Route::prefix('ataques')->group(function () {
+            Route::delete('/delete/{id}', [AttacksController::class, 'delete'])->name('ataques.delete');
             Route::get('/http-keep-alive', [AttacksController::class, 'http_keep_alive_index'])->name('ataques.http-keep-alive');
             Route::get('/http-keep-alive/cadastrar', [AttacksController::class, 'http_keep_alive_cadastrof'])->name('ataques.http-keep-alive.cadratrof');
             Route::post('/http-keep-alive/cadastrar', [AttacksController::class, 'http_keep_alive_cadastro'])->name('ataques.http-keep-alive.cadastro');
+            Route::get('/http-keep-alive/{id}', [AttacksController::class, 'http_keep_alive_attack'])->name('ataques.http-keep-alive.ataque');
         });  
     });
 });

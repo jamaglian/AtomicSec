@@ -18,6 +18,14 @@
                     </button>
                 </div>
             @endif
+            @if(session('fail'))
+                <div class="alert alert-danger alert-dismissible" role="alert">
+                    {{ session('fail') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+            @endif
             <div class="d-flex justify-content-end mb-3">
                 <a href="{{ route('ataques.http-keep-alive.cadratrof', absolute: false) }}" class="btn btn-primary btn-lg btn-icon" data-toggle="tooltip" title="Adicionar Análise">
                     <i class="fa fa-fw fa-plus"></i>
@@ -47,7 +55,7 @@
                             @endif
                             <td>{{ $ataque->status }}</td>
                             <td>
-                            <a href="{{ route('analysis.analise', ['id' => $ataque->id]) }}" class="btn btn-icon btn-pill btn-primary" data-toggle="tooltip" title="Ver"><i class="fa fa-fw fa-eye"></i></a>
+                            <a href="{{ route('ataques.http-keep-alive.ataque', ['id' => $ataque->id]) }}" class="btn btn-icon btn-pill btn-primary" data-toggle="tooltip" title="Ver"><i class="fa fa-fw fa-eye"></i></a>
                             <a href="#" class="btn btn-icon btn-pill btn-danger" data-toggle="modal" data-target="#modal_delete" data-item="{{ $ataque->id }}" title="Delete"><i class="fa fa-fw fa-trash"></i></a>
                             </td>
                         </tr>
@@ -72,7 +80,7 @@
 
             // Update the modal's content.
             var modal = $(this);
-            modal.find('.modal-title').text(modal.find('.modal-title').text() + ' ( Ataque na aplicação ' + item + ' )');
+            modal.find('.modal-title').text(modal.find('.modal-title').text() + ' ( Ataque ' + item + ' )');
 
             // Pass the item to the delete function
             $('#modal_delete_confirm').off('click').on('click', function () {
@@ -80,7 +88,7 @@
 
                 $('<form>', {
                     "method": "post",
-                    "action": "{{ route('analysis.delete', '') }}/" + item
+                    "action": "{{ route('ataques.delete', '') }}/" + item
                 }).append($('<input>', {
                     "type": "hidden",
                     "name": "_method",

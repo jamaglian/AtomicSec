@@ -207,6 +207,7 @@ func main() {
     // Envia sinal para parar todas as goroutines
     close(stopChan)
     fmt.Println("Processo finalizado.")
+    os.Exit(0)
     // Mantém o programa rodando
     //select {}
 }

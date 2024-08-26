@@ -14,7 +14,7 @@
             {{ __('Ataque HTTP Keep-Alive para Aplicação da empresa ')}} <b> {{$company->name}} </b>
             </div>
             <div class="card-body">
-                <form method="POST" action="{{ route('ataques.http-keep-alive.cadastro') }}">
+                <form id="atacar_form" method="POST" action="{{ route('ataques.http-keep-alive.cadastro') }}">
                     @csrf
                     <div class="form-group">
                         <label for="aplicacao">Escolha uma aplicação: </label>
@@ -44,10 +44,24 @@
                             <option value="no" selected>Não</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label for="tempo">Tempo de ataque: </label>
+                        <select class="form-control" id="tempo" name="tempo">
+                            <option value="30s" selected>30s</option>
+                            <option value="1m">1m</option>
+                            <option value="2m">2m</option>
+                            <option value="3m">3m</option>
+                            <option value="4m">4m</option>
+                            <option value="5m">5m</option>
+                            <option value="6m">6m</option>
+                            <option value="7m">7m</option>
+                            <option value="8m">8m</option>
+                        </select>
+                    </div>
                 </form>
             </div>
             <div class="card-footer bg-white">
-                <button type="submit" class="btn btn-danger">{{ __('Atacar') }}</button>
+                <button type="submit"  data-toggle="modal" data-target="#modal_attack" class="btn btn-danger">{{ __('Atacar') }}</button>
             </div>
         @else
             <div class="card-header bg-white font-weight-bold">
@@ -62,4 +76,25 @@
             </div>
         @endif
     </div>
+    <x-atomicsec-modal 
+        modal_id="modal_attack" 
+        titulo="Ataque HTTP Keep-Alive" 
+        confirm="true" 
+        texto="Tem certeza que deseja atacar essa aplição ?" 
+        texto_confirmacao="Atacar" 
+        texto_cancelar="Cancelar"
+    ></x-atomicsec-modal>
+    <x-slot name="extra_script">
+        $('#modal_attack').on('show.bs.modal', function (event) {
+
+            // Update the modal's content.
+            var modal = $(this);
+            modal.find('.modal-title').text(modal.find('.modal-title').text() + ' ( Aplicação ' + document.getElementById('aplicacao').options[document.getElementById('aplicacao').selectedIndex].text + ' )');
+
+            // Pass the item to the delete function
+            $('#modal_attack_confirm').off('click').on('click', function () {
+                document.getElementById('atacar_form').submit();
+            });
+        });
+    </x-slot>
 </x-dashboard-layout>

@@ -64,6 +64,14 @@ jobs:
         docker save -o analyzeragent-dev.tar analyzeragent:dev
         scp ./analyzeragent-dev.tar desenvolvimento-host:~/analyzeragent-dev.tar
         ssh desenvolvimento-host "docker load -i ~/analyzeragent-dev.tar && rm ~/analyzeragent-dev.tar"
+    
+    - name: Build and set up HTTP Keep Alive Attack
+      run: |
+        sudo apt install golang-go
+        mkdir /home/runner/work/AtomicSec/AtomicSec/Atomic/storage/attacks
+        cd /home/runner/work/AtomicSec/AtomicSec/Attacks/HTTP_Keep-Alive/
+        GOOS=linux GOARCH=amd64 go build -o HTTP_Keep_Alive
+        cp ./HTTP_Keep_Alive /home/runner/work/AtomicSec/AtomicSec/Atomic/storage/attacks/
 
     - name: Web platform sync files
       run: |
@@ -97,6 +105,8 @@ jobs:
         #set permissions
         ssh desenvolvimento-host "sudo chown www-data:www-data -R /var/www/atomic.sec/dev/"
         ssh desenvolvimento-host "sudo chmod 775 -R /var/www/atomic.sec/dev/"
+        #Setup attack permissions
+        ssh desenvolvimento-host "sudo chmod +x -R /var/www/atomic.sec/dev/storage/attacks/HTTP_Keep_Alive"
 
     - name: Setup again
       if: ${{ github.event.inputs.fresh-deploy == 'true' }}
@@ -107,4 +117,9 @@ jobs:
         ssh desenvolvimento-host "cd /var/www/atomic.sec/dev/ && php artisan view:cache"
         ssh desenvolvimento-host "cd /var/www/atomic.sec/dev/ && php artisan storage:link"
         ssh desenvolvimento-host "cd /var/www/atomic.sec/dev/ && php artisan queue:restart"
+        #set permissions
+        ssh desenvolvimento-host "sudo chown www-data:www-data -R /var/www/atomic.sec/dev/"
+        ssh desenvolvimento-host "sudo chmod 775 -R /var/www/atomic.sec/dev/"
+        #Setup attack permissions
+        ssh desenvolvimento-host "sudo chmod +x -R /var/www/atomic.sec/dev/storage/attacks/HTTP_Keep_Alive"
         ssh desenvolvimento-host "sudo systemctl restart dev_laravel_worker.service"
