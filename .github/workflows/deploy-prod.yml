@@ -117,6 +117,7 @@ jobs:
         ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan view:cache"
         ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan storage:link"
         ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan queue:restart"
+        ssh producao-host "mkdir -p /var/www/atomic.sec/producao/storage/framework/cache/data"
         #set permissions
         ssh producao-host "sudo chown www-data:www-data -R /var/www/atomic.sec/dev/"
         ssh producao-host "sudo chmod 775 -R /var/www/atomic.sec/dev/"
