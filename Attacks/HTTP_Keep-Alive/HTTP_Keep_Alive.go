@@ -119,7 +119,7 @@ func attack(ctx context.Context, proxyURL string, dialTimeout, tlsTimeout, clien
             }
             defer resp.Body.Close()
 
-            fmt.Println("Conexão aberta através do proxy:", proxyURL, "Status:", resp.Status)
+            fmt.Println("Conexão aberta através do proxy status:", resp.Status)
 
             // Envia cabeçalhos adicionais para manter a conexão ativa
             for {

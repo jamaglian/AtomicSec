@@ -110,7 +110,7 @@ class AttacksController extends Controller
         if(!$aplication) {
             throw new \Exception(__("A aplicação não foi encontrada."));
         }
-        
+        $request->use_proxy = (($aplication->waf != 'Não definido')?'yes':$request->use_proxy);
         if($request->use_proxy == 'yes' && env('PROXY_TO_USE', '') == ''){//$aplication->waf != 'Não definido' || $request->use_proxy == 'yes') {
             return redirect(route('ataques.http-keep-alive', absolute: false))->with('fail', __('Atualmente não temos proxy. Não é possível realizar o ataque.'));
             //throw new \Exception(__("Atualmente não temos proxy. Não é possível realizar o ataque."));
