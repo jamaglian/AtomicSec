@@ -107,6 +107,7 @@ jobs:
         ssh producao-host "sudo chmod 775 -R /var/www/atomic.sec/dev/"
         #Setup attack permissions
         ssh producao-host "sudo chmod +x -R /var/www/atomic.sec/dev/bin/attacks/HTTP_Keep_Alive"
+        ssh producao-host "sudo systemctl restart prod_laravel_worker.service"
 
     - name: Setup again
       if: ${{ github.event.inputs.fresh-deploy == 'true' }}

