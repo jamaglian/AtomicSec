@@ -19,7 +19,8 @@ class Applications extends Model
         'company_id',
         'name',
         'url',
-        'type'
+        'type',
+        'waf'
     ];
     /**
      * Get the companies associated with the application.
@@ -35,4 +36,12 @@ class Applications extends Model
     {
         return $this->hasMany(ApplicationsAnalysis::class, 'application_id');
     }
+    /**
+     * Get the attacks associated with the application.
+     */
+    public function attacks()
+    {
+        return $this->hasMany(ApplicationAttack::class, 'application_id');
+    }
+
 }

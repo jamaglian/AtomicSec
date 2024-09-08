@@ -14,6 +14,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use App\Jobs\ApplicationsAnalysisJob;
 use App\Models\ApplicationsAnalysis;
+use Illuminate\Console\Application;
 use Illuminate\Support\Facades\Redirect;
 
 class AnalysisController extends Controller
@@ -52,7 +53,7 @@ class AnalysisController extends Controller
                 $allAnalyses[] = $analysis;
             }
         }
-        return view('analises/analises', [
+        return view('atomicsec.dashboard.analises.index', [
             "company"      => $this->empresa,
             "applications" => $this->empresa->applications,
             "analises"     => $allAnalyses
@@ -66,7 +67,7 @@ class AnalysisController extends Controller
      */
     public function cadastrof(Request $request): View
     {
-        return view('analises/cadastrar', [
+        return view('atomicsec.dashboard.analises.cadastrar', [
             "company"      => $this->empresa,
             "applications" => $this->empresa->applications,
         ]);
@@ -108,10 +109,30 @@ class AnalysisController extends Controller
     public function analise($id): View
     {
         $analysis = ApplicationsAnalysis::findOrFail($id);
-
-        return view('analises/analise', [
-            "analise"      => $analysis
+        $aplication = Applications::findOrFail($analysis->application_id);
+        if($this->empresa->id != $aplication->company_id) {
+            return redirect(route('analysis.index', absolute: false))->with('error', __('Você não tem permissão para acessar essa análise.'));
+        }
+        $analysis_data = json_decode($analysis->analysis);
+        return view('atomicsec.dashboard.analises.analise', [
+            "analise"                => $analysis,
+            "links_encontrados"      => ((isset($analysis_data->serverRequestTimeMap))?$analysis_data->serverRequestTimeMap:null),
         ]);
     }
-
+    /**
+     * Apaga uma análise.
+     *
+     * @param Request $request A requisição HTTP recebida.
+     * @return RedirectResponse Uma resposta de redirecionamento, se aplicável.
+     */
+    public function delete($id): RedirectResponse
+    {
+        $analysis = ApplicationsAnalysis::findOrFail($id);
+        $aplication = Applications::findOrFail($analysis->application_id);
+        if($this->empresa->id != $aplication->company_id) {
+            return redirect(route('analysis.index', absolute: false))->with('error', __('Você não tem permissão para deletar essa análise.'));
+        }
+        $analysis->delete();
+        return redirect(route('analysis.index', absolute: false))->with('success', __('Analise deletada com sucesso.'));
+    }
 }

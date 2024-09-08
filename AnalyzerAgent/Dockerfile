@@ -6,7 +6,11 @@ WORKDIR /home/node/app
 
 COPY package*.json ./
 
-RUN npm install
+ENV CHROME_BIN="/usr/bin/chromium-browser"\
+    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD="true"
+
+RUN apk add --no-cache chromium \
+    && npm install
 
 COPY . .
 

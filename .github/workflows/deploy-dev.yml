@@ -64,6 +64,14 @@ jobs:
         docker save -o analyzeragent-dev.tar analyzeragent:dev
         scp ./analyzeragent-dev.tar desenvolvimento-host:~/analyzeragent-dev.tar
         ssh desenvolvimento-host "docker load -i ~/analyzeragent-dev.tar && rm ~/analyzeragent-dev.tar"
+    
+    - name: Build and set up HTTP Keep Alive Attack
+      run: |
+        sudo apt install golang-go
+        mkdir -p /home/runner/work/AtomicSec/AtomicSec/Atomic/bin/attacks
+        cd /home/runner/work/AtomicSec/AtomicSec/Attacks/HTTP_Keep-Alive/
+        GOOS=linux GOARCH=amd64 go build -o HTTP_Keep_Alive
+        cp ./HTTP_Keep_Alive /home/runner/work/AtomicSec/AtomicSec/Atomic/bin/attacks/
 
     - name: Web platform sync files
       run: |
@@ -79,12 +87,6 @@ jobs:
               --exclude='vendor' \
               --include='storage/framework' \
               --exclude='storage/*' \
-              --include='public/.htaccess' \
-              --include='public/favicon.ico' \
-              --include='public/index.php' \
-              --include='public/images' \
-              --include='public/build' \
-              --exclude='public/*' \
               --exclude='.env' \
               /home/runner/work/AtomicSec/AtomicSec/Atomic/ desenvolvimento-host:/var/www/atomic.sec/dev/
 
@@ -95,13 +97,19 @@ jobs:
       run: |
         #Setup .env
         echo "$ENV_DEV" > env_dev
+        ssh desenvolvimento-host "rm /var/www/atomic.sec/dev/.env"
         scp ./env_dev desenvolvimento-host:/var/www/atomic.sec/dev/.env
         rm ./env_dev
         #Install composer dependencies
         ssh desenvolvimento-host "cd /var/www/atomic.sec/dev/ && composer install --no-dev --optimize-autoloader"
+        #Make results directory
+        ssh desenvolvimento-host "mkdir -p /var/www/atomic.sec/dev/storage/framework/cache/data"
         #set permissions
         ssh desenvolvimento-host "sudo chown www-data:www-data -R /var/www/atomic.sec/dev/"
         ssh desenvolvimento-host "sudo chmod 775 -R /var/www/atomic.sec/dev/"
+        #Setup attack permissions
+        ssh desenvolvimento-host "sudo chmod +x -R /var/www/atomic.sec/dev/bin/attacks/HTTP_Keep_Alive"
+        ssh desenvolvimento-host "sudo systemctl restart dev_laravel_worker.service"
 
     - name: Setup again
       if: ${{ github.event.inputs.fresh-deploy == 'true' }}
@@ -112,5 +120,11 @@ jobs:
         ssh desenvolvimento-host "cd /var/www/atomic.sec/dev/ && php artisan view:cache"
         ssh desenvolvimento-host "cd /var/www/atomic.sec/dev/ && php artisan storage:link"
         ssh desenvolvimento-host "cd /var/www/atomic.sec/dev/ && php artisan queue:restart"
-        ssh desenvolvimento-host "sudo systemctl start dev_laravel_worker.service"
-        
+        #Make results directory
+        ssh desenvolvimento-host "mkdir -p /var/www/atomic.sec/dev/storage/framework/cache/data"
+        #set permissions
+        ssh desenvolvimento-host "sudo chown www-data:www-data -R /var/www/atomic.sec/dev/"
+        ssh desenvolvimento-host "sudo chmod 775 -R /var/www/atomic.sec/dev/"
+        #Setup attack permissions
+        ssh desenvolvimento-host "sudo chmod +x -R /var/www/atomic.sec/dev/bin/attacks/HTTP_Keep_Alive"
+        ssh desenvolvimento-host "sudo systemctl restart dev_laravel_worker.service"

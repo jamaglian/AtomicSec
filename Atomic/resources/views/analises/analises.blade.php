@@ -40,7 +40,7 @@
                                 <td>{{ $analise->status }}</td>
                                 <td>
                                     <a href="{{ route('analysis.analise', ['id' => $analise->id]) }}" class="btn btn-sm btn-primary">Ver</a>
-                                    <a href="" class="btn btn-sm btn-danger">Excluir</a>
+                                    <a href="#" data-toggle="modal" data-target="#exampleModal" data-id="{{ $analise->id }}" class="btn btn-sm btn-danger btn-delete">Excluir</a>
                                 </td>
                             </tr>
                             @endforeach
@@ -50,4 +50,43 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="deleteForm" action="" method="post">
+                    <div class="modal-body">
+                        @csrf
+                        @method('DELETE')
+                        <h5 class="text-center">Você quer mesmo apagar a análise?</h5>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900" data-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Apagar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var deleteButtons = document.querySelectorAll('.btn-delete');
+            var deleteForm = document.getElementById('deleteForm');
+
+            deleteButtons.forEach(function(button) {
+                button.addEventListener('click', function () {
+                    var analysisId = button.getAttribute('data-id');
+                    var action = "{{ route('analysis.delete', '') }}/" + analysisId;
+                    deleteForm.setAttribute('action', action);
+                });
+            });
+        });
+    </script>
 </x-app-layout>

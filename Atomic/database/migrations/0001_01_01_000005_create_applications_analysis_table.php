@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('application_id')->unsigned();
             $table->foreign('application_id')->references('id')->on('applications');
             $table->json('analysis')->nullable();
-            $table->text('log')->nullable();
+            $table->longText('log')->nullable();
             $table->string('status')->default('Pendente');
             $table->timestamp('started_at')->nullable();
             $table->timestamp('finish_at')->nullable();
