@@ -103,10 +103,10 @@ jobs:
         #Install composer dependencies
         ssh producao-host "cd /var/www/atomic.sec/producao/ && composer install --no-dev --optimize-autoloader"
         #set permissions
-        ssh producao-host "sudo chown www-data:www-data -R /var/www/atomic.sec/dev/"
-        ssh producao-host "sudo chmod 775 -R /var/www/atomic.sec/dev/"
+        ssh producao-host "sudo chown www-data:www-data -R /var/www/atomic.sec/producao/"
+        ssh producao-host "sudo chmod 775 -R /var/www/atomic.sec/producao/"
         #Setup attack permissions
-        ssh producao-host "sudo chmod +x -R /var/www/atomic.sec/dev/bin/attacks/HTTP_Keep_Alive"
+        ssh producao-host "sudo chmod +x -R /var/www/atomic.sec/producao/bin/attacks/HTTP_Keep_Alive"
         ssh producao-host "sudo systemctl restart prod_laravel_worker.service"
 
     - name: Setup again
@@ -120,8 +120,8 @@ jobs:
         ssh producao-host "cd /var/www/atomic.sec/producao/ && php artisan queue:restart"
         ssh producao-host "mkdir -p /var/www/atomic.sec/producao/storage/framework/cache/data"
         #set permissions
-        ssh producao-host "sudo chown www-data:www-data -R /var/www/atomic.sec/dev/"
-        ssh producao-host "sudo chmod 775 -R /var/www/atomic.sec/dev/"
+        ssh producao-host "sudo chown www-data:www-data -R /var/www/atomic.sec/producao/"
+        ssh producao-host "sudo chmod 775 -R /var/www/atomic.sec/producao/"
         #Setup attack permissions
-        ssh producao-host "sudo chmod +x -R /var/www/atomic.sec/dev/bin/attacks/HTTP_Keep_Alive"
+        ssh producao-host "sudo chmod +x -R /var/www/atomic.sec/producao/bin/attacks/HTTP_Keep_Alive"
         ssh producao-host "sudo systemctl restart prod_laravel_worker.service"
