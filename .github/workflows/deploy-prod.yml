@@ -102,6 +102,8 @@ jobs:
         rm ./env_producao
         #Install composer dependencies
         ssh producao-host "cd /var/www/atomic.sec/producao/ && composer install --no-dev --optimize-autoloader"
+        #Make results directory
+        ssh producao-host "mkdir -p /var/www/atomic.sec/producao/storage/framework/cache/data"
         #set permissions
         ssh producao-host "sudo chown www-data:www-data -R /var/www/atomic.sec/producao/"
         ssh producao-host "sudo chmod 775 -R /var/www/atomic.sec/producao/"

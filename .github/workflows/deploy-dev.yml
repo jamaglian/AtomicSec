@@ -102,6 +102,8 @@ jobs:
         rm ./env_dev
         #Install composer dependencies
         ssh desenvolvimento-host "cd /var/www/atomic.sec/dev/ && composer install --no-dev --optimize-autoloader"
+        #Make results directory
+        ssh desenvolvimento-host "mkdir -p /var/www/atomic.sec/dev/storage/framework/cache/data"
         #set permissions
         ssh desenvolvimento-host "sudo chown www-data:www-data -R /var/www/atomic.sec/dev/"
         ssh desenvolvimento-host "sudo chmod 775 -R /var/www/atomic.sec/dev/"
@@ -118,6 +120,7 @@ jobs:
         ssh desenvolvimento-host "cd /var/www/atomic.sec/dev/ && php artisan view:cache"
         ssh desenvolvimento-host "cd /var/www/atomic.sec/dev/ && php artisan storage:link"
         ssh desenvolvimento-host "cd /var/www/atomic.sec/dev/ && php artisan queue:restart"
+        #Make results directory
         ssh desenvolvimento-host "mkdir -p /var/www/atomic.sec/dev/storage/framework/cache/data"
         #set permissions
         ssh desenvolvimento-host "sudo chown www-data:www-data -R /var/www/atomic.sec/dev/"
