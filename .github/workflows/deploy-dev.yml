@@ -73,6 +73,14 @@ jobs:
         GOOS=linux GOARCH=amd64 go build -o HTTP_Keep_Alive
         cp ./HTTP_Keep_Alive /home/runner/work/AtomicSec/AtomicSec/Atomic/bin/attacks/
 
+    - name: Build and set up HTTP Slow Post Attack
+      run: |
+        sudo apt install golang-go
+        mkdir -p /home/runner/work/AtomicSec/AtomicSec/Atomic/bin/attacks
+        cd /home/runner/work/AtomicSec/AtomicSec/Attacks/HTTP_Slow-Post/
+        GOOS=linux GOARCH=amd64 go build -o HTTP_Slow_Post
+        cp ./HTTP_Slow_Post /home/runner/work/AtomicSec/AtomicSec/Atomic/bin/attacks/
+
     - name: Web platform sync files
       run: |
         rsync -z \

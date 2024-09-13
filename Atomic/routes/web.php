@@ -15,6 +15,11 @@ Route::get('/', function () {
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    /*
+    |--------------------------------------------------------------------------
+    | Rotas de Browser
+    |--------------------------------------------------------------------------
+    */
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -36,7 +41,21 @@ Route::middleware('auth')->group(function () {
             Route::get('/http-keep-alive/cadastrar', [AttacksController::class, 'http_keep_alive_cadastrof'])->name('ataques.http-keep-alive.cadratrof');
             Route::post('/http-keep-alive/cadastrar', [AttacksController::class, 'http_keep_alive_cadastro'])->name('ataques.http-keep-alive.cadastro');
             Route::get('/http-keep-alive/{id}', [AttacksController::class, 'http_keep_alive_attack'])->name('ataques.http-keep-alive.ataque');
+            Route::get('/http-slow-post', [AttacksController::class, 'http_slow_post_index'])->name('ataques.http-slow-post');
+            Route::get('/http-slow-post/cadastrar', [AttacksController::class, 'http_slow_post_cadastrof'])->name('ataques.http-slow-post.cadratrof');
+            Route::post('/http-slow-post/cadastrar', [AttacksController::class, 'http_slow_post_cadastro'])->name('ataques.http-slow-post.cadastro');
+            Route::get('/http-slow-post/{id}', [AttacksController::class, 'http_slow_post_attack'])->name('ataques.http-slow-post.ataque');
         });  
+    });
+    /*
+    |--------------------------------------------------------------------------
+    | Rotas de AJAX
+    |--------------------------------------------------------------------------
+    */
+    Route::prefix('ajax')->group(function () {
+        Route::prefix('aplicacoes')->group(function () {
+            Route::get('/{id}/ultima-analise', [AnalysisController::class, 'getLatestAnalysis'])->name('aplicacoes.ajax-ultima-analise');
+        });
     });
 });
 
