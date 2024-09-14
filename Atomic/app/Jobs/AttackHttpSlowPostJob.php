@@ -43,26 +43,34 @@ class AttackHttpSlowPostJob implements ShouldQueue
             $this->applicationsAttack->status = 'Rodando...';
             $this->applicationsAttack->save(); // Salva o log em tempo real
             $params = json_decode($this->applicationsAttack->attack_params, true);
-            $attackCommand = env('ATTACKS_DATA_PATH', '/var/www/html/bin/attacks/') . "HTTP_Slow_Post -url={$params['url']} -params='{$params['params_post']}' -workers={$params['atacantes']} -process-timeout={$params['tempo']} " . (($params['use_proxy'] == 'yes' && env('PROXY_TO_USE', '') != '')? "-proxies=" . env('PROXY_TO_USE', ''):'');
-            //$attackCommand = env('ATTACKS_DATA_PATH', '/var/www/html/bin/attacks/') . "HTTP_Keep_Alive -url={$this->applicationsAttack->application->url} -threads={$params['atacantes']} -process-timeout={$params['tempo']} " . (($params['use_proxy'] == 'yes' && env('PROXY_TO_USE', '') != '')? "-proxies=" . env('PROXY_TO_USE', ''):'');
-            $process = proc_open($attackCommand, [
-                0 => ['pipe', 'r'],  // stdin
-                1 => ['pipe', 'w'],  // stdout
-                2 => ['pipe', 'w']   // stderr
-            ], $pipes);
-            fclose($pipes[0]);
-            $this->applicationsAttack->log .= $attackCommand;
-            $this->applicationsAttack->save();
+            $attackCommand = env('ATTACKS_DATA_PATH', '/var/www/html/bin/attacks/') . "HTTP_Slow_Post -url=\"{$params['url']}\" -params=\"{$params['params_post']}\" -workers={$params['atacantes']} -process-timeout={$params['tempo']} " . (($params['use_proxy'] == 'yes' && env('PROXY_TO_USE', '') != '')? "-proxies=" . env('PROXY_TO_USE', ''):'');
+            //$attackCommand = env('ATTACKS_DATA_PATH', '/var/www/html/bin/attacks/') . "HTTP_Slow_Post -url={$params['url']} -params='{$params['params_post']}' -workers={$params['atacantes']} -process-timeout={$params['tempo']} " . (($params['use_proxy'] == 'yes' && env('PROXY_TO_USE', '') != '')? "-proxies=" . env('PROXY_TO_USE', ''):'');
+            $process = proc_open($attackCommand, [1 => ['pipe', 'w']], $pipes);
+
             if (is_resource($process)) {
+                $buffer = ''; // Buffer para acumular a saída
+                $linesToSave = 50; // Número de linhas a acumular antes de salvar
+                
                 while (!feof($pipes[1])) {
                     $line = fgets($pipes[1]);
-                    // Salva a saída do contêiner Docker no banco de dados
-                    $this->applicationsAttack->log .= $line;
+                    $buffer .= $line;
+                
+                    // Verifica se atingiu o número de linhas para salvar
+                    if (substr_count($buffer, "\n") >= $linesToSave) {
+                        $this->applicationsAttack->log .= $buffer;
+                        $this->applicationsAttack->save();
+                        $buffer = ''; // Limpa o buffer após salvar
+                    }
+                }
+                
+                // Salva qualquer resto que possa estar no buffer
+                if (!empty($buffer)) {
+                    $this->applicationsAttack->log .= $buffer;
                     $this->applicationsAttack->save();
                 }
+                
                 // Fecha o pipe
                 fclose($pipes[1]);
-                fclose($pipes[2]);
                 // Fecha o processo
                 $status = proc_close($process);
                 if ($status !== 0) {

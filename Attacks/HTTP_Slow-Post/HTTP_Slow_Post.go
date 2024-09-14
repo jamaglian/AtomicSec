@@ -1,4 +1,3 @@
-
 package main
 
 import (
@@ -206,13 +205,15 @@ func attack(ctx context.Context, proxyURL string, stopChan <-chan struct{}) {
 						time.Sleep(parseDuration(delaySend))
                 }
             }
-			attack(ctx, proxyURL, stopChan)
+			go attack(ctx, proxyURL, stopChan)
     }
 }
 func attack_sem_proxy(ctx  context.Context, stopChan <-chan struct{}) {
     select {
         case <-ctx.Done():
             return
+        case <-stopChan:
+			return
         default:
 			var bodyBuffer bytes.Buffer
 
@@ -281,7 +282,7 @@ func attack_sem_proxy(ctx  context.Context, stopChan <-chan struct{}) {
 
                 }
             }
-			attack_sem_proxy(ctx, stopChan)
+			go attack_sem_proxy(ctx, stopChan)
     }
 }
 func main() {

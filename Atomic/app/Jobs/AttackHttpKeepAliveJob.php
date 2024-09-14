@@ -49,13 +49,27 @@ class AttackHttpKeepAliveJob implements ShouldQueue
             $process = proc_open($attackCommand, [1 => ['pipe', 'w']], $pipes);
 
             if (is_resource($process)) {
-                // Lê a saída do contêiner Docker linha por linha
+                $buffer = ''; // Buffer para acumular a saída
+                $linesToSave = 50; // Número de linhas a acumular antes de salvar
+                
                 while (!feof($pipes[1])) {
                     $line = fgets($pipes[1]);
-                    // Salva a saída do contêiner Docker no banco de dados
-                    $this->applicationsAttack->log .= $line;
+                    $buffer .= $line;
+                
+                    // Verifica se atingiu o número de linhas para salvar
+                    if (substr_count($buffer, "\n") >= $linesToSave) {
+                        $this->applicationsAttack->log .= $buffer;
+                        $this->applicationsAttack->save();
+                        $buffer = ''; // Limpa o buffer após salvar
+                    }
+                }
+                
+                // Salva qualquer resto que possa estar no buffer
+                if (!empty($buffer)) {
+                    $this->applicationsAttack->log .= $buffer;
                     $this->applicationsAttack->save();
                 }
+                
                 // Fecha o pipe
                 fclose($pipes[1]);
                 // Fecha o processo
