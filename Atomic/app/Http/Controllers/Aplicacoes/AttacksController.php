@@ -229,7 +229,7 @@ class AttacksController extends Controller
         AttackHttpKeepAliveJob::dispatch($atacar);
         return redirect(route('ataques.http-keep-alive', absolute: false))->with('success', __('Ataque cadastrado e adicionado a fila de execução com sucesso.'));
     }   
-        /**
+    /**
      * Exibe a página de informações do ataque HTTP Keep alive.
      *
      * @param Request $request A requisição HTTP recebida.
@@ -249,5 +249,30 @@ class AttacksController extends Controller
         }else{
             return redirect(route('ataques.http-keep-alive', absolute: false))->with('fail', __('Ataque não correspondente.'));
         }
+    }
+
+    /**
+     * Cancelar ataque
+     *
+     * @param Request $request A requisição HTTP recebida.
+     * @return RedirectResponse Uma resposta de visualização para o formulário de cadastro de empresas.
+     */
+    public function cancel_attack($id): RedirectResponse
+    {
+        $attack = ApplicationAttack::findOrFail($id);
+        $aplication = Applications::findOrFail($attack->application_id);
+        if($this->empresa->id != $aplication->company_id) {
+            return redirect(route('ataques.http-keep-alive', absolute: false))->with('fail', __('Você não tem permissão para acessar esse ataque.'));
+        }
+        if($attack->status != "Rodando..." || !isset($attack->pid) || $attack->pid < 1){
+            return redirect(route('ataques.http-keep-alive', absolute: false))->with('fail', __('Algo deu errado.'));
+        }
+
+        exec("kill -9 " . $attack->pid, $output, $return_var);
+
+        if ($return_var !== 0) {
+            return redirect(route('ataques.http-keep-alive', absolute: false))->with('fail', __('Algo deu errado. O processo não foi finalizado. (' . $attack->pid . ')'));
+        }
+        return redirect(route('ataques.http-keep-alive', absolute: false))->with('success', __('Ataque cancelado com sucesso, pode demorar um pouco para que o status seja alterado.'));
     }
 }

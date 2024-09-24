@@ -35,7 +35,9 @@ return new class extends Migration
             $table->foreign('attacks_types_id')->references('id')->on('attacks_types');
             $table->json('attack_params')->nullable();
             $table->json('attack_analysis')->nullable();
+            $table->unsignedInteger('pid')->nullable();
             $table->longText('log')->nullable();
+            $table->string('job_uuid')->nullable();
             $table->string('status')->default('Pendente');
             $table->timestamp('started_at')->nullable();
             $table->timestamp('finish_at')->nullable();

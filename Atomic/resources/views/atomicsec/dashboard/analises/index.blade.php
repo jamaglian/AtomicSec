@@ -10,6 +10,14 @@
                     </button>
                 </div>
             @endif
+            @if(session('fail'))
+                <div class="alert alert-danger alert-dismissible" role="alert">
+                    {{ session('fail') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+            @endif
             <div class="d-flex justify-content-end mb-3">
                 <a href="{{ route('analysis.cadastrof', absolute: false) }}" class="btn btn-primary btn-lg btn-icon" data-toggle="tooltip" title="Adicionar Análise">
                     <i class="fa fa-fw fa-plus"></i>

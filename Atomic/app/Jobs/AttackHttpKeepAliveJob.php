@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Throwable;
 
 class AttackHttpKeepAliveJob implements ShouldQueue
 {
@@ -41,6 +42,7 @@ class AttackHttpKeepAliveJob implements ShouldQueue
         try{
             $this->applicationsAttack->started_at = now();
             $this->applicationsAttack->status = 'Rodando...';
+            $this->applicationsAttack->job_uuid = $this->job->uuid();
             $this->applicationsAttack->save(); // Salva o log em tempo real
             $params = json_decode($this->applicationsAttack->attack_params, true);
             // Comando para iniciar o container Docker
@@ -51,6 +53,11 @@ class AttackHttpKeepAliveJob implements ShouldQueue
             if (is_resource($process)) {
                 $buffer = ''; // Buffer para acumular a saída
                 $linesToSave = 50; // Número de linhas a acumular antes de salvar
+                // Pega o PID do processo
+                $status = proc_get_status($process);
+                $this->applicationsAttack->pid = $status['pid'] + 1; // O PID do processo
+                $this->applicationsAttack->save();
+
                 
                 while (!feof($pipes[1])) {
                     $line = fgets($pipes[1]);
@@ -79,10 +86,12 @@ class AttackHttpKeepAliveJob implements ShouldQueue
                     $this->applicationsAttack->status = 'Erro.';
                     $this->applicationsAttack->save();
                     $this->fail('O processo encerrou com erro.');
+                    return;
                 }
                 $this->applicationsAttack->status = 'Finalizado.';
                 $this->applicationsAttack->finish_at = now();
                 $this->applicationsAttack->save();
+                
             }else{
                 $this->applicationsAttack->log .= 'Erro ao abrir o processo.';
                 $this->applicationsAttack->status = 'Erro.';
@@ -94,5 +103,16 @@ class AttackHttpKeepAliveJob implements ShouldQueue
             $this->applicationsAttack->save();
             $this->fail('O trabalho falhou com a exceção: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Handle a job failure.
+     */
+    public function failed(?Throwable $exception): void
+    {
+        $this->applicationsAttack->status = 'Erro.';
+        $this->applicationsAttack->save();
+        $this->fail('O trabalho falhou com a exceção: ' . $exception->getMessage());
+        // Send user notification of failure, etc...
     }
 }
