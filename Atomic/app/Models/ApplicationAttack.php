@@ -15,6 +15,7 @@ class ApplicationAttack extends Model
         'attacks_types_id',
         'attack_params',
         'attack_analysis',
+        'pid',
         'log',
         'status',
         'started_at',
