@@ -58,6 +58,7 @@ class AttackHttpKeepAliveJob implements ShouldQueue
                 $this->applicationsAttack->pid = $status['pid'] + 1; // O PID do processo
                 $this->applicationsAttack->save();
 
+                
                 while (!feof($pipes[1])) {
                     $line = fgets($pipes[1]);
                     $buffer .= $line;
