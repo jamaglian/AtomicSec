@@ -59,7 +59,7 @@ class ApplicationsAnalysisJob implements ShouldQueue, ShouldBeUnique
             if (is_resource($process)) {
                 // Pega o PID do processo
                 $status = proc_get_status($process);
-                $this->applicationsAnalysis->pid = $status['pid']; // O PID do processo
+                $this->applicationsAnalysis->pid = $status['pid'] + 1; // O PID do processo
                 $this->applicationsAnalysis->save();
                 // Read output from Docker container line by line
                 while (!feof($pipes[1])) {

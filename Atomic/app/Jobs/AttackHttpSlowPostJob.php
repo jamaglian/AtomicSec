@@ -53,7 +53,7 @@ class AttackHttpSlowPostJob implements ShouldQueue
                 $linesToSave = 50; // Número de linhas a acumular antes de salvar
                 // Pega o PID do processo
                 $status = proc_get_status($process);
-                $this->applicationsAttack->pid = $status['pid']; // O PID do processo
+                $this->applicationsAttack->pid = $status['pid'] + 1; // O PID do processo
                 $this->applicationsAttack->save();
                 while (!feof($pipes[1])) {
                     $line = fgets($pipes[1]);
