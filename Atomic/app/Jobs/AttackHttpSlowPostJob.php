@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Throwable;
 
 class AttackHttpSlowPostJob implements ShouldQueue
 {
@@ -41,16 +42,19 @@ class AttackHttpSlowPostJob implements ShouldQueue
         try{
             $this->applicationsAttack->started_at = now();
             $this->applicationsAttack->status = 'Rodando...';
+            $this->applicationsAttack->job_uuid = $this->job->uuid();
             $this->applicationsAttack->save(); // Salva o log em tempo real
             $params = json_decode($this->applicationsAttack->attack_params, true);
             $attackCommand = env('ATTACKS_DATA_PATH', '/var/www/html/bin/attacks/') . "HTTP_Slow_Post -url=\"{$params['url']}\" -params=\"{$params['params_post']}\" -workers={$params['atacantes']} -process-timeout={$params['tempo']} " . (($params['use_proxy'] == 'yes' && env('PROXY_TO_USE', '') != '')? "-proxies=" . env('PROXY_TO_USE', ''):'');
-            //$attackCommand = env('ATTACKS_DATA_PATH', '/var/www/html/bin/attacks/') . "HTTP_Slow_Post -url={$params['url']} -params='{$params['params_post']}' -workers={$params['atacantes']} -process-timeout={$params['tempo']} " . (($params['use_proxy'] == 'yes' && env('PROXY_TO_USE', '') != '')? "-proxies=" . env('PROXY_TO_USE', ''):'');
             $process = proc_open($attackCommand, [1 => ['pipe', 'w']], $pipes);
 
             if (is_resource($process)) {
                 $buffer = ''; // Buffer para acumular a saída
                 $linesToSave = 50; // Número de linhas a acumular antes de salvar
-                
+                // Pega o PID do processo
+                $status = proc_get_status($process);
+                $this->applicationsAttack->pid = $status['pid']; // O PID do processo
+                $this->applicationsAttack->save();
                 while (!feof($pipes[1])) {
                     $line = fgets($pipes[1]);
                     $buffer .= $line;
@@ -78,6 +82,7 @@ class AttackHttpSlowPostJob implements ShouldQueue
                     $this->applicationsAttack->status = 'Erro.';
                     $this->applicationsAttack->save();
                     $this->fail('O processo encerrou com erro.');
+                    return;
                 }
                 $this->applicationsAttack->status = 'Finalizado.';
                 $this->applicationsAttack->finish_at = now();
@@ -93,5 +98,16 @@ class AttackHttpSlowPostJob implements ShouldQueue
             $this->applicationsAttack->save();
             $this->fail('O trabalho falhou com a exceção: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Handle a job failure.
+     */
+    public function failed(?Throwable $exception): void
+    {
+        $this->applicationsAttack->status = 'Erro.';
+        $this->applicationsAttack->save();
+        $this->fail('O trabalho falhou com a exceção: ' . $exception->getMessage());
+        // Send user notification of failure, etc...
     }
 }

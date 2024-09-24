@@ -11,6 +11,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 class ApplicationsAnalysisJob implements ShouldQueue, ShouldBeUnique
 {
@@ -46,6 +47,7 @@ class ApplicationsAnalysisJob implements ShouldQueue, ShouldBeUnique
         try {
             $this->applicationsAnalysis->started_at = now();
             $this->applicationsAnalysis->status = 'Rodando...';
+            $this->applicationsAnalysis->job_uuid = $this->job->uuid();
             $this->applicationsAnalysis->save(); // Save log in real-time
 
             // Command to start Docker container
@@ -55,6 +57,10 @@ class ApplicationsAnalysisJob implements ShouldQueue, ShouldBeUnique
             $process = proc_open($dockerCommand, [1 => ['pipe', 'w']], $pipes);
 
             if (is_resource($process)) {
+                // Pega o PID do processo
+                $status = proc_get_status($process);
+                $this->applicationsAnalysis->pid = $status['pid']; // O PID do processo
+                $this->applicationsAnalysis->save();
                 // Read output from Docker container line by line
                 while (!feof($pipes[1])) {
                     $line = fgets($pipes[1]);
@@ -125,5 +131,15 @@ class ApplicationsAnalysisJob implements ShouldQueue, ShouldBeUnique
             $this->applicationsAnalysis->save();
             $this->fail('O trabalho falhou com a exceção: ' . $e->getMessage());
         }
+    }
+    /**
+     * Handle a job failure.
+     */
+    public function failed(?Throwable $exception): void
+    {
+        $this->applicationsAnalysis->status = 'Erro.';
+        $this->applicationsAnalysis->save();
+        $this->fail('O trabalho falhou com a exceção: ' . $exception->getMessage());
+        // Send user notification of failure, etc...
     }
 }
