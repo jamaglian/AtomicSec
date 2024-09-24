@@ -1,6 +1,8 @@
 @props(
     [
-        'extra_script'
+        'extra_script',
+        'extra_head_tag',
+        'extra_end_tag'
     ]
 )
 <!doctype html>
@@ -19,7 +21,11 @@
             'resources/css/fullcalendar.css',
             'resources/css/atomic.css'
         ])
-
+        @if(isset($extra_head_tag))
+            {!!
+                 $extra_head_tag
+            !!}
+        @endif
         <title>Dashboard | {{ config('app.name', 'Laravel') }}</title>
     </head>
     <body class="bg-light">
@@ -45,6 +51,11 @@
                  $extra_script
             !!}
         </script>
+        @endif
+        @if(isset($extra_end_tag))
+            {!!
+                 $extra_end_tag
+            !!}
         @endif
     </body>
 </html>

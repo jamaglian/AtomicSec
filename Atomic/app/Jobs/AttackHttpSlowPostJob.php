@@ -9,7 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class AttackHttpKeepAliveJob implements ShouldQueue
+class AttackHttpSlowPostJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -43,9 +43,8 @@ class AttackHttpKeepAliveJob implements ShouldQueue
             $this->applicationsAttack->status = 'Rodando...';
             $this->applicationsAttack->save(); // Salva o log em tempo real
             $params = json_decode($this->applicationsAttack->attack_params, true);
-            // Comando para iniciar o container Docker
-            $attackCommand = env('ATTACKS_DATA_PATH', '/var/www/html/bin/attacks/') . "HTTP_Keep_Alive -url={$this->applicationsAttack->application->url} -threads={$params['atacantes']} -process-timeout={$params['tempo']} " . (($params['use_proxy'] == 'yes' && env('PROXY_TO_USE', '') != '')? "-proxies=" . env('PROXY_TO_USE', ''):'');
-            // Abre um pipe para o processo Docker
+            $attackCommand = env('ATTACKS_DATA_PATH', '/var/www/html/bin/attacks/') . "HTTP_Slow_Post -url=\"{$params['url']}\" -params=\"{$params['params_post']}\" -workers={$params['atacantes']} -process-timeout={$params['tempo']} " . (($params['use_proxy'] == 'yes' && env('PROXY_TO_USE', '') != '')? "-proxies=" . env('PROXY_TO_USE', ''):'');
+            //$attackCommand = env('ATTACKS_DATA_PATH', '/var/www/html/bin/attacks/') . "HTTP_Slow_Post -url={$params['url']} -params='{$params['params_post']}' -workers={$params['atacantes']} -process-timeout={$params['tempo']} " . (($params['use_proxy'] == 'yes' && env('PROXY_TO_USE', '') != '')? "-proxies=" . env('PROXY_TO_USE', ''):'');
             $process = proc_open($attackCommand, [1 => ['pipe', 'w']], $pipes);
 
             if (is_resource($process)) {
