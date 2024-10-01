@@ -26,16 +26,7 @@
                     </div>
                     <div class="form-group">
                         <label for="atacantes">Número de atacantes: </label>
-                        <select class="form-control" id="atacantes" name="atacantes">
-                            <option value="1">1</option>
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="50" selected>50</option>
-                            <option value="75">75</option>
-                            <option value="100">100</option>
-                            <option value="125">125</option>
-                            <option value="150">150</option>
-                        </select>
+                        <input class="form-control" type="number" id="atacantes" name="atacantes" value="500">
                     </div>
                     <div class="form-group">
                         <label for="use_proxy">Usar Proxy (Para aplicações com WAF essa configuração não tem efeito.): </label>
