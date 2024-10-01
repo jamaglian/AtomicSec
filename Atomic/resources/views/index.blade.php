@@ -50,11 +50,8 @@
                     <h2>in the first place</h2 -->
                     <img style="height: 20em;" src="{{ asset('/images/Logo.png') }}" />
                 </div>
-                <div class="pageSeparator">
-                    <div class="separator"></div>
-                </div>
                 <div class="pageDescription">
-                    <h3>Atomic</h3>
+                    <h3><img src="/images/plataform_logo.png" alt="Logo Plat" style="height: 60px;"></h3>
                 </div>
             </div>
         </div>

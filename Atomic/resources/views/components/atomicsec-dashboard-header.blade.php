@@ -1,7 +1,8 @@
-<nav class="navbar navbar-expand navbar-dark bg-danger">
+<nav class="navbar navbar-expand navbar-dark" style="background-color: #e81b1a;">
     <a class="sidebar-toggle mr-3" href="#"><i class="fa fa-bars"></i></a>
     <a class="navbar-brand" href="{{route('dashboard')}}">
-        <img src="/images/Logo.png" alt="Logo" style="height: 60px;"> {{ config('app.name', 'Laravel') }}
+        <img src="/images/Logo.png" alt="Logo" style="height: 60px;">
+        <img src="/images/plataform_logo.png" alt="Logo Plat" style="height: 30px;">
     </a>
     <div class="navbar-collapse collapse">
         <ul class="navbar-nav ml-auto">
