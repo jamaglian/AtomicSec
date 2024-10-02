@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Aplicacoes;
 use App\Models\User;
 use App\Models\Companies;
 use Illuminate\View\View;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Applications;
 use Illuminate\Validation\Rules;
@@ -73,9 +74,26 @@ class AplicacoesController extends Controller
             'url'  => ['required', 'string', 'lowercase', 'url', 'max:255', 'unique:' . Applications::class],
         ]);
 
+        // Get the submitted URL
+        $url = $request->url;
+
+        // Step 1: Ensure the URL has an http:// or https:// scheme
+        if (!Str::startsWith($url, ['http://', 'https://'])) {
+            $url = 'https://' . $url; // Default to http if scheme is missing
+        }
+
+        // Step 2: Remove any path after the domain, keeping only the base URL
+        $parsedUrl = parse_url($url);
+        $url = $parsedUrl['scheme'] . '://' . $parsedUrl['host'];
+
+        // Step 3: Ensure the URL ends with a trailing slash
+        if (!Str::endsWith($url, '/')) {
+            $url .= '/';
+        }
+
         $aplicacao = Applications::create([
             'name' => $request->name,
-            'url' => $request->url,
+            'url' => $url,
             'company_id' => $this->empresa->id
         ]);
 

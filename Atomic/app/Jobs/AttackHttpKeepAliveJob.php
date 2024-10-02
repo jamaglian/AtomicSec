@@ -85,7 +85,7 @@ class AttackHttpKeepAliveJob implements ShouldQueue
                     $this->applicationsAttack->log .= 'O processo encerrou com erro.';
                     $this->applicationsAttack->status = 'Erro.';
                     $this->applicationsAttack->save();
-                    $this->fail('O processo encerrou com erro.');
+                    $this->fail('O processo encerrou com erro. ('. $attackCommand .')');
                     return;
                 }
                 $this->applicationsAttack->status = 'Finalizado.';

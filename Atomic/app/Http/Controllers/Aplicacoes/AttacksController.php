@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Aplicacoes;
 use App\Models\User;
 use App\Models\Companies;
 use Illuminate\View\View;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Applications;
 use Illuminate\Validation\Rules;
@@ -100,12 +101,13 @@ class AttacksController extends Controller
     public function http_slow_post_cadastro(Request $request): RedirectResponse
     {
         $request->validate([
-            'aplicacao' => ['required', 'int'],
-            'atacantes' => ['required', 'int'],
-            'use_proxy' => ['required', 'in:yes,no'],
-            'tempo'     => ['required', 'string', 'max:5'],
-            'params_post' => ['required', 'string'],
-            'action_url' => ['required', 'string']
+            'aplicacao'     => ['required', 'int'],
+            'atacantes'     => ['required', 'int'],
+            'use_proxy'     => ['required', 'in:yes,no'],
+            'tempo'         => ['required', 'string', 'max:5'],
+            'params_post'   => ['required', 'string'],
+            'action_url'    => ['required', 'string'],
+            'tamanho_corpo' => ['required', 'int']
         ]);
         $applications = $this->empresa->applications;
 
@@ -114,21 +116,29 @@ class AttacksController extends Controller
         if(!$aplication) {
             throw new \Exception(__("A aplicação não foi encontrada."));
         }
+
         $request->use_proxy = (($aplication->waf != 'Não definido')?'yes':$request->use_proxy);
-        if($request->use_proxy == 'yes' && env('PROXY_TO_USE', '') == ''){//$aplication->waf != 'Não definido' || $request->use_proxy == 'yes') {
+        if($request->use_proxy == 'yes' && env('PROXY_TO_USE', '') == ''){
             return redirect(route('ataques.http-slow-post', absolute: false))->with('fail', __('Atualmente não temos proxy. Não é possível realizar o ataque.'));
-            //throw new \Exception(__("Atualmente não temos proxy. Não é possível realizar o ataque."));
+        }
+        
+        $action_url = $request->action_url;
+        // Check if the URL is a relative path
+        if (Str::startsWith($action_url, '/')) {
+            // Prepend the base URL
+            $action_url = rtrim($aplication->url, '/') . $action_url;
         }
 
         $atacar = ApplicationAttack::create([
             'application_id'    => $request->aplicacao,
             'attacks_types_id'  => 2,
             'attack_params'     => json_encode([
-                'url'           => $request->action_url,
+                'url'           => $action_url,
                 'atacantes'     => $request->atacantes,
                 'tempo'         => $request->tempo,
                 'use_proxy'     => $request->use_proxy,
-                'params_post'   => $request->params_post
+                'params_post'   => $request->params_post,
+                'tamanho_corpo' => $request->tamanho_corpo
             ])
         ]);
         AttackHttpSlowPostJob::dispatch($atacar);
@@ -262,17 +272,17 @@ class AttacksController extends Controller
         $attack = ApplicationAttack::findOrFail($id);
         $aplication = Applications::findOrFail($attack->application_id);
         if($this->empresa->id != $aplication->company_id) {
-            return redirect(route('ataques.http-keep-alive', absolute: false))->with('fail', __('Você não tem permissão para acessar esse ataque.'));
+            return redirect(route('ataques.' . (($attack->attacks_types_id == 1)? 'http-keep-alive' : 'http-slow-post'), absolute: false))->with('fail', __('Você não tem permissão para acessar esse ataque.'));
         }
         if($attack->status != "Rodando..." || !isset($attack->pid) || $attack->pid < 1){
-            return redirect(route('ataques.http-keep-alive', absolute: false))->with('fail', __('Algo deu errado.'));
+            return redirect(route('ataques.' . (($attack->attacks_types_id == 1)? 'http-keep-alive' : 'http-slow-post'), absolute: false))->with('fail', __('Algo deu errado.'));
         }
 
         exec("kill -9 " . $attack->pid, $output, $return_var);
 
         if ($return_var !== 0) {
-            return redirect(route('ataques.http-keep-alive', absolute: false))->with('fail', __('Algo deu errado. O processo não foi finalizado. (' . $attack->pid . ')'));
+            return redirect(route('ataques.' . (($attack->attacks_types_id == 1)? 'http-keep-alive' : 'http-slow-post'), absolute: false))->with('fail', __('Algo deu errado. O processo não foi finalizado. (' . $attack->pid . ')'));
         }
-        return redirect(route('ataques.http-keep-alive', absolute: false))->with('success', __('Ataque cancelado com sucesso, pode demorar um pouco para que o status seja alterado.'));
+        return redirect(route('ataques.' . (($attack->attacks_types_id == 1)? 'http-keep-alive' : 'http-slow-post'), absolute: false))->with('success', __('Ataque cancelado com sucesso, pode demorar um pouco para que o status seja alterado.'));
     }
 }

