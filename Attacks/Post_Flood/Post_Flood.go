@@ -263,7 +263,6 @@ func attack_sem_proxy(ctx  context.Context, stopChan <-chan struct{}) {
             var body string
             body = bodyForRequest()
 
-
             // Inicializa o cookie jar (para manter cookies entre as requisições)
             jar, err := cookiejar.New(nil)
             if err != nil {
