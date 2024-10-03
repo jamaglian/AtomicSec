@@ -46,6 +46,10 @@ Route::middleware('auth')->group(function () {
             Route::get('/http-slow-post/cadastrar', [AttacksController::class, 'http_slow_post_cadastrof'])->name('ataques.http-slow-post.cadratrof');
             Route::post('/http-slow-post/cadastrar', [AttacksController::class, 'http_slow_post_cadastro'])->name('ataques.http-slow-post.cadastro');
             Route::get('/http-slow-post/{id}', [AttacksController::class, 'http_slow_post_attack'])->name('ataques.http-slow-post.ataque');
+            Route::get('/post-flood', [AttacksController::class, 'post_flood_index'])->name('ataques.post-flood');
+            Route::get('/post-flood/cadastrar', [AttacksController::class, 'post_flood_cadastrof'])->name('ataques.post-flood.cadratrof');
+            Route::post('/post-flood/cadastrar', [AttacksController::class, 'post_flood_cadastro'])->name('ataques.post-flood.cadastro');
+            Route::get('/post-flood/{id}', [AttacksController::class, 'post_flood_attack'])->name('ataques.post-flood.ataque');
         });  
     });
     /*

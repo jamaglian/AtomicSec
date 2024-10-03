@@ -1,5 +1,5 @@
 <x-dashboard-layout>
-    <h2 class="mb-4">Cadastrar Ataque HTTP Slow-POST @if(Auth::user()->isGlobalAdmin()) <b class="text-danger"> (Global Admin) </b> @endif </h2>
+    <h2 class="mb-4">Cadastrar Ataque Post-Flood @if(Auth::user()->isGlobalAdmin()) <b class="text-danger"> (Global Admin) </b> @endif </h2>
     <div class="alert alert-danger" role="alert"> 
         <div class="d-flex justify-content-center">
             <h4 class="alert-heading">Área de risco!</h4>
@@ -11,10 +11,10 @@
     <div class="card mb-4">
         @if(count($applications) > 0)
             <div class="card-header bg-white font-weight-bold">
-            {{ __('Ataque HTTP Slow-POST para Aplicação da empresa ')}} <b> {{$company->name}} </b>
+            {{ __('Ataque Post-Flood para Aplicação da empresa ')}} <b> {{$company->name}} </b>
             </div>
             <div class="card-body">
-                <form id="atacar_form" method="POST" action="{{ route('ataques.http-slow-post.cadastro') }}">
+                <form id="atacar_form" method="POST" action="{{ route('ataques.post-flood.cadastro') }}">
                     @csrf
                     <div class="form-group">
                         <label for="aplicacao">Escolha uma aplicação: </label>
@@ -99,7 +99,7 @@
 
     <x-atomicsec-modal 
         modal_id="modal_attack" 
-        titulo="Ataque HTTP Slow-Post" 
+        titulo="Ataque Post-Flood" 
         confirm="true" 
         texto="Tem certeza que deseja atacar essa aplição ?" 
         texto_confirmacao="Atacar" 

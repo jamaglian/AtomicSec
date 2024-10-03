@@ -63,7 +63,7 @@ func calculateParamSize(totalSize int, params []string) int {
 // Function to generate a Unicode string of a specific size (in bytes)
 func generateUnicodeString(sizeBytes int) string {
 	var builder strings.Builder
-	unicodeChar := "你好مرحباこんにちは你" // You can replace this with other Unicode characters
+	unicodeChar := "♞★Â§♘你好مرحباこんにちは🌐😊๓๔" // You can replace this with other Unicode characters
 	for builder.Len() < sizeBytes {
 		builder.WriteString(unicodeChar)
 	}
