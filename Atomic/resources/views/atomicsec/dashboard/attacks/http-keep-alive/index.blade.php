@@ -1,5 +1,35 @@
 <x-dashboard-layout>
-    <h2 class="mb-4">HTTP Keep-Alive @if(Auth::user()->isGlobalAdmin()) <b class="text-danger"> (Global Admin) </b> @endif </h2>
+    <h2 class="mb-4">HTTP Keep-Alive 
+        @if(Auth::user()->isGlobalAdmin()) 
+            <b class="text-danger"> (Global Admin) </b> 
+        @endif 
+        <a class="btn btn-icon btn-pill btn-outline-danger" data-toggle="collapse" href="#collapseExplain" role="button" aria-expanded="true" aria-controls="collapseExplain" data-original-title="Ver">
+            <i class="fa fa-fw fa-question"></i>
+        </a>
+    </h2>
+    <div class="collapse pb-2" id="collapseExplain" style="">
+        <div class="card card-body">
+            <h5><strong>Entendendo o Ataque HTTP Keep-Alive</strong></h5>
+            <p>
+                O ataque HTTP Keep-Alive explora uma característica presente no protocolo HTTP, que permite manter conexões abertas por um tempo prolongado, economizando recursos ao evitar múltiplos handshakes. 
+                No entanto, atacantes mal-intencionados podem abusar dessa funcionalidade ao enviar pacotes de dados mínimos e manter a conexão aberta por longos períodos, esgotando os recursos do servidor sem a necessidade de gerar muito tráfego visível.
+            </p>
+            <h6><strong>Por que é Efetivo Mesmo com WAF?</strong></h6>
+            <p>
+                Muitos WAFs (Web Application Firewalls) são projetados para detectar e bloquear grandes volumes de solicitações maliciosas ou padrões de ataque conhecidos, mas o HTTP Keep-Alive é difícil de detectar porque não depende de grandes volumes de dados, e sim de uma abordagem mais sutil e prolongada.
+            </p>
+            <h6><strong>Como Minimizar o Impacto?</strong></h6>
+            <ul>
+                <li><strong>Limitação de Conexões Persistentes:</strong> Configurar o servidor para limitar o número de conexões simultâneas ou o tempo máximo permitido para conexões Keep-Alive pode evitar que recursos sejam consumidos por muito tempo.</li>
+                <li><strong>Monitoramento de Conexões Inativas:</strong> Implementar monitoramento constante para identificar padrões de conexão inativa ou de baixa transmissão de dados pode ajudar a detectar tentativas de ataque.</li>
+                <li><strong>Ajustes no Time-out:</strong> Reduzir o tempo de ociosidade permitido para conexões Keep-Alive antes de serem fechadas pelo servidor pode ajudar a reduzir o impacto desse tipo de ataque.</li>
+            </ul>
+            <p>
+                Embora o HTTP Keep-Alive tenha seus benefícios em termos de performance, essas medidas ajudam a equilibrar a segurança, mitigando o potencial de ataques sem prejudicar os usuários legítimos.
+            </p>
+        </div>
+    </div>
+
     <div class="alert alert-danger" role="alert"> 
         <div class="d-flex justify-content-center">
             <h4 class="alert-heading">Área de risco!</h4>

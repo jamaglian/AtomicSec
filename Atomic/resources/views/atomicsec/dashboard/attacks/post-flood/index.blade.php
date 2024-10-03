@@ -1,5 +1,36 @@
 <x-dashboard-layout>
-    <h2 class="mb-4">Post-Flood @if(Auth::user()->isGlobalAdmin()) <b class="text-danger"> (Global Admin) </b> @endif </h2>
+    <h2 class="mb-4">Post-Flood 
+        @if(Auth::user()->isGlobalAdmin()) 
+            <b class="text-danger"> (Global Admin) </b> 
+        @endif 
+        <a class="btn btn-icon btn-pill btn-outline-danger" data-toggle="collapse" href="#collapseExplain" role="button" aria-expanded="true" aria-controls="collapseExplain" data-original-title="Ver">
+            <i class="fa fa-fw fa-question"></i>
+        </a>
+    </h2>
+    <div class="collapse pb-2" id="collapseExplain" style="">
+        <div class="card card-body">
+            <h5><strong>Entendendo o Ataque POST Flood</strong></h5>
+            <p>
+                O ataque POST Flood é um tipo de ataque DDoS (Distributed Denial of Service) que sobrecarrega o servidor ao enviar um grande volume de requisições POST em um curto espaço de tempo. Cada requisição POST contém dados que precisam ser processados, resultando em um alto consumo de recursos como CPU, memória e largura de banda, o que pode deixar o servidor lento ou até mesmo indisponível.
+            </p>
+            <h6><strong>Por que o POST Flood é Perigoso?</strong></h6>
+            <p>
+                Como as requisições POST geralmente envolvem processamento no lado do servidor (como gravação de dados ou geração de respostas dinâmicas), elas exigem mais recursos do que requisições GET. Um ataque de POST Flood pode rapidamente exaurir os recursos do servidor, afetando o desempenho e a capacidade de atender a usuários legítimos. Além disso, o ataque pode ser distribuído entre várias máquinas, tornando difícil bloquear todos os IPs envolvidos.
+            </p>
+            <h6><strong>Como Minimizar o Impacto?</strong></h6>
+            <ul>
+                <li><strong>Rate Limiting:</strong> Implementar limites de taxa (rate limiting) por IP ou sessão pode ajudar a evitar que um único atacante ou um grupo de atacantes sobrecarregue o servidor com um grande volume de requisições POST.</li>
+                <li><strong>CAPTCHA em Formulários:</strong> Adicionar CAPTCHAs em formulários que utilizam requisições POST pode impedir que bots automatizados realizem ataques de POST Flood em massa.</li>
+                <li><strong>Verificação de Padrões Anômalos:</strong> Monitorar o tráfego em busca de padrões incomuns, como um grande número de requisições POST vindas de poucos IPs em um curto período, permite identificar e bloquear ataques rapidamente.</li>
+                <li><strong>Filtragem por WAF:</strong> Configurar um Web Application Firewall (WAF) para detectar e bloquear requisições POST excessivas ou que apresentem padrões de ataque pode mitigar o impacto de POST Floods.</li>
+                <li><strong>Cacheamento de Respostas:</strong> Sempre que possível, cachear as respostas das requisições POST pode reduzir a carga do servidor, já que respostas repetidas não precisariam ser processadas novamente.</li>
+            </ul>
+            <p>
+                O POST Flood pode ser devastador quando um servidor não está preparado para lidar com grandes volumes de requisições, mas com as medidas corretas de limitação de taxa, autenticação via CAPTCHA e monitoramento ativo, é possível mitigar seus efeitos e proteger o servidor.
+            </p>
+        </div>
+    </div>
+
     <div class="alert alert-danger" role="alert"> 
         <div class="d-flex justify-content-center">
             <h4 class="alert-heading">Área de risco!</h4>

