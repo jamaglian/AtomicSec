@@ -16,6 +16,7 @@ use Illuminate\Http\RedirectResponse;
 use App\Jobs\ApplicationsAnalysisJob;
 use App\Jobs\AttackHttpSlowPostJob;
 use App\Jobs\AttackHttpKeepAliveJob;
+use App\Jobs\AttackXMLRPCFloodJob;
 use App\Jobs\AttackPostFloodJob;
 use App\Models\ApplicationAttack;
 use App\Models\ApplicationsAnalysis;
@@ -41,6 +42,107 @@ class AttacksController extends Controller
         }
     }
 
+    /**
+     * **************************************************************************************************************************
+     * XML RPC Flood
+     * **************************************************************************************************************************
+     */
+
+       /**
+     * Exibe a página de informações do ataque XML RPC Flood.
+     *
+     * @param Request $request A requisição HTTP recebida.
+     * @return View Uma resposta de visualização para o formulário de cadastro de empresas.
+     */
+    public function xml_rpc_flood_attack($id): View
+    {
+        $attack = ApplicationAttack::findOrFail($id);
+        if($attack->attacks_types_id == 4) {
+            $aplication = Applications::findOrFail($attack->application_id);
+            if($this->empresa->id != $aplication->company_id) {
+                return redirect(route('ataques.xml-rpc-flood', absolute: false))->with('fail', __('Você não tem permissão para acessar esse ataque.'));
+            }
+            return view('atomicsec.dashboard.attacks.xml-rpc-flood.ataque', [
+                "attack"                => $attack
+            ]);
+        }else{
+            return redirect(route('ataques.xml-rpc-flood', absolute: false))->with('fail', __('Ataque não correspondente.'));
+        }
+    }
+    /**
+     * Exibe os ataques XML RPC Flood da empresa.
+     *
+     * @param Request $request A requisição HTTP recebida.
+     * @return View Uma resposta de visualização contendo os dados dos ataques XML RPC Flood da empresa.
+     */
+    public function xml_rpc_flood_index(Request $request): View
+    {
+        $applications = $this->empresa->applications;
+
+        $ataques = $this->empresa->applications->flatMap(function ($application) {
+            return $application->attacks()->where('attacks_types_id', 4)->get();
+        });
+
+        return view('atomicsec.dashboard.attacks.xml-rpc-flood.index', [
+            "company"      => $this->empresa,
+            "ataques"      => $ataques, 
+            "applications" => $this->empresa->applications
+        ]);
+    }
+    /**
+     * Exibe a página de criação de um novo ataque XML RPC Flood.
+     *
+     * @param Request $request A requisição HTTP recebida.
+     * @return View Uma resposta de visualização para o formulário de cadastro do ataque XML RPC Flood.
+     */
+    public function xml_rpc_flood_cadastrof(Request $request): View
+    {
+        return view('atomicsec.dashboard.attacks.xml-rpc-flood.cadastrar', [
+            "company"      => $this->empresa,
+            "applications" => $this->empresa->applications()->where('type', 'WordPress')->whereHas('analysis', function ($query) {
+                $query->where('status', 'Finalizada.');
+            })->get(),
+        ]);
+    }
+    /**
+     * Exibe a página de criação ataque XML RPC Flood.
+     *
+     * @param Request $request A requisição HTTP recebida.
+     * @return RedirectResponse Uma resposta de redirecionamento, se aplicável.
+     */
+    public function xml_rpc_flood_cadastro(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'aplicacao' => ['required', 'int'],
+            'atacantes' => ['required', 'int'],
+            'use_proxy' => ['required', 'in:yes,no'],
+            'tempo'     => ['required', 'string', 'max:5'],
+        ]);
+        $applications = $this->empresa->applications;
+
+        $aplication = $applications->firstWhere('id', $request->aplicacao);
+
+        if(!$aplication) {
+            throw new \Exception(__("A aplicação não foi encontrada."));
+        }
+        $request->use_proxy = (($aplication->waf != 'Não definido')?'yes':$request->use_proxy);
+        if($request->use_proxy == 'yes' && env('PROXY_TO_USE', '') == ''){//$aplication->waf != 'Não definido' || $request->use_proxy == 'yes') {
+            return redirect(route('ataques.xml-rpc-flood', absolute: false))->with('fail', __('Atualmente não temos proxy. Não é possível realizar o ataque.'));
+            //throw new \Exception(__("Atualmente não temos proxy. Não é possível realizar o ataque."));
+        }
+
+        $atacar = ApplicationAttack::create([
+            'application_id'    => $request->aplicacao,
+            'attacks_types_id'  => 4,
+            'attack_params'     => json_encode([
+                'atacantes' => $request->atacantes,
+                'tempo'     => $request->tempo,
+                'use_proxy' => $request->use_proxy,
+            ])
+        ]);
+        AttackXMLRPCFloodJob::dispatch($atacar);
+        return redirect(route('ataques.xml-rpc-flood', absolute: false))->with('success', __('Ataque cadastrado e adicionado a fila de execução com sucesso.'));
+    }   
 
     /**
      * **************************************************************************************************************************
@@ -251,13 +353,7 @@ class AttacksController extends Controller
         AttackHttpSlowPostJob::dispatch($atacar);
         return redirect(route('ataques.http-slow-post', absolute: false))->with('success', __('Ataque cadastrado e adicionado a fila de execução com sucesso.'));
     }   
-    /**
-     * **************************************************************************************************************************
-     * HTTP Keep Alive
-     * **************************************************************************************************************************
-     */
-
-       /**
+           /**
      * Exibe a página de informações do ataque HTTP Keep alive.
      *
      * @param Request $request A requisição HTTP recebida.
@@ -278,6 +374,12 @@ class AttacksController extends Controller
             return redirect(route('ataques.http-slow-post', absolute: false))->with('fail', __('Ataque não correspondente.'));
         }
     }
+    /**
+     * **************************************************************************************************************************
+     * HTTP Keep Alive
+     * **************************************************************************************************************************
+     */
+
     /**
      * Exibe os ataques HTTP Keep alive da empresa.
      *
@@ -387,6 +489,8 @@ class AttacksController extends Controller
                 return 'ataques.http-slow-post';
             case 3:
                 return 'ataques.post-flood';
+            case 4:
+                return 'ataques.xml-rpc-flood';
             default:
                 return 'dashboard';
         }

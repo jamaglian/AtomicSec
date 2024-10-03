@@ -31,6 +31,10 @@ return new class extends Migration
             'name' => 'Post-Flood',
             'params' => json_encode(['url' => 'url', 'proxys_virgulados' => 'proxys', 'threads' => 0]),
         ]);
+        \App\Models\AttackType::create([
+            'name' => 'XML RPC Flood',
+            'params' => json_encode(['url' => 'url', 'proxys_virgulados' => 'proxys', 'threads' => 0]),
+        ]);
         Schema::create('application_attacks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('application_id')->unsigned();
