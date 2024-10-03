@@ -1,5 +1,35 @@
 <x-dashboard-layout>
-    <h2 class="mb-4">HTTP Slow-POST @if(Auth::user()->isGlobalAdmin()) <b class="text-danger"> (Global Admin) </b> @endif </h2>
+    <h2 class="mb-4">HTTP Slow-POST 
+        @if(Auth::user()->isGlobalAdmin()) 
+            <b class="text-danger"> (Global Admin) </b> 
+        @endif 
+        <a class="btn btn-icon btn-pill btn-outline-danger" data-toggle="collapse" href="#collapseExplain" role="button" aria-expanded="true" aria-controls="collapseExplain" data-original-title="Ver">
+            <i class="fa fa-fw fa-question"></i>
+        </a>
+    </h2>
+    <div class="collapse pb-2" id="collapseExplain" style="">
+        <div class="card card-body">
+            <h5><strong>Entendendo o Ataque Slow POST</strong></h5>
+            <p>
+                O ataque Slow POST explora a maneira como os servidores processam os pedidos HTTP POST, onde o atacante envia dados de formulário de forma extremamente lenta. O servidor, por padrão, espera até que o corpo da solicitação POST seja completamente recebido, o que permite que atacantes mantenham uma conexão aberta por um longo período sem concluir o envio de dados, esgotando os recursos do servidor.
+            </p>
+            <h6><strong>Por que é Difícil de Detectar?</strong></h6>
+            <p>
+                Ao contrário de ataques tradicionais de negação de serviço, o Slow POST não depende de um grande volume de tráfego, o que torna mais difícil para os WAFs (Web Application Firewalls) detectarem automaticamente. Além disso, o comportamento de envio lento simula uma conexão legítima, dificultando a diferenciação entre um usuário genuíno e um atacante.
+            </p>
+            <h6><strong>Como Minimizar o Impacto?</strong></h6>
+            <ul>
+                <li><strong>Ajuste de Timeouts:</strong> Configurar tempos limite (timeouts) mais curtos para recebimento de dados de POST pode ajudar a fechar conexões que estão tentando se arrastar lentamente, minimizando o consumo de recursos.</li>
+                <li><strong>Limite de Tamanho de Requisição:</strong> Estabelecer limites de tamanho para os dados POST e monitorar a taxa de upload pode identificar tentativas de envio extremamente lento e bloquear o ataque.</li>
+                <li><strong>Monitoramento de Conexões Lentamente Ativas:</strong> Implementar ferramentas de monitoramento que identifiquem conexões que enviam dados de forma irregular ou em baixa velocidade pode ajudar a detectar tentativas de Slow POST.</li>
+                <li><strong>Uso de Servidores Proxy:</strong> Utilizar proxies configurados com limitação de tempo e taxa de envio pode proteger o servidor principal contra essas tentativas de ataque.</li>
+            </ul>
+            <p>
+                O ataque Slow POST é efetivo devido à sua natureza furtiva, mas com o ajuste adequado de tempos limite e monitoramento de conexões lentas, é possível minimizar significativamente seu impacto sem afetar os usuários legítimos.
+            </p>
+        </div>
+    </div>
+
     <div class="alert alert-danger" role="alert"> 
         <div class="d-flex justify-content-center">
             <h4 class="alert-heading">Área de risco!</h4>
