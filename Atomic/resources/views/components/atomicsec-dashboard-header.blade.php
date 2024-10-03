@@ -9,7 +9,7 @@
             <li class="nav-item dropdown">
                 <a href="#" id="dd_user" class="nav-link dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> {{ Auth::user()->name }}</a>
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dd_user">
-                    <a href="{{route('profile.edit')}}" class="dropdown-item">{{ __('Profile') }}</a>
+                    <!-- a href="{{route('profile.edit')}}" class="dropdown-item">{{ __('Profile') }}</a -->
                     <form class="dropdown-item" id="logout-form" action="{{ route('logout') }}" method="POST">
                         @csrf
                         <a type="submit" href="{{route('logout')}}" class="dropdown-item text-left" onclick="event.preventDefault(); this.closest('form').submit();">{{ __('Log Out') }}</a>
