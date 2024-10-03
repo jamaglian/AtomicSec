@@ -85,6 +85,12 @@ jobs:
         GOOS=linux GOARCH=amd64 go build -o Post_Flood
         cp ./Post_Flood /home/runner/work/AtomicSec/AtomicSec/Atomic/bin/attacks/
 
+    - name: Build and set up XML RPC Flood Attack
+      run: |
+        cd /home/runner/work/AtomicSec/AtomicSec/Attacks/XML_RPC_Flood
+        GOOS=linux GOARCH=amd64 go build -o XML_RPC_Flood
+        cp ./XML_RPC_Flood /home/runner/work/AtomicSec/AtomicSec/Atomic/bin/attacks/
+
     - name: Web platform sync files
       run: |
         rsync -z \

@@ -38,18 +38,42 @@ Route::middleware('auth')->group(function () {
         Route::prefix('ataques')->group(function () {
             Route::get('/cancelar/{id}', [AttacksController::class, 'cancel_attack'])->name('ataques.cancel');
             Route::delete('/delete/{id}', [AttacksController::class, 'delete'])->name('ataques.delete');
+            /**
+             * **************************************************************************************************************************
+             * HTTP Keep Alive
+             * **************************************************************************************************************************
+             */
             Route::get('/http-keep-alive', [AttacksController::class, 'http_keep_alive_index'])->name('ataques.http-keep-alive');
             Route::get('/http-keep-alive/cadastrar', [AttacksController::class, 'http_keep_alive_cadastrof'])->name('ataques.http-keep-alive.cadratrof');
             Route::post('/http-keep-alive/cadastrar', [AttacksController::class, 'http_keep_alive_cadastro'])->name('ataques.http-keep-alive.cadastro');
             Route::get('/http-keep-alive/{id}', [AttacksController::class, 'http_keep_alive_attack'])->name('ataques.http-keep-alive.ataque');
+            /**
+             * **************************************************************************************************************************
+             * HTTP Slow POST
+             * **************************************************************************************************************************
+             */
             Route::get('/http-slow-post', [AttacksController::class, 'http_slow_post_index'])->name('ataques.http-slow-post');
             Route::get('/http-slow-post/cadastrar', [AttacksController::class, 'http_slow_post_cadastrof'])->name('ataques.http-slow-post.cadratrof');
             Route::post('/http-slow-post/cadastrar', [AttacksController::class, 'http_slow_post_cadastro'])->name('ataques.http-slow-post.cadastro');
             Route::get('/http-slow-post/{id}', [AttacksController::class, 'http_slow_post_attack'])->name('ataques.http-slow-post.ataque');
+            /**
+             * **************************************************************************************************************************
+             * Post Flood
+             * **************************************************************************************************************************
+             */
             Route::get('/post-flood', [AttacksController::class, 'post_flood_index'])->name('ataques.post-flood');
             Route::get('/post-flood/cadastrar', [AttacksController::class, 'post_flood_cadastrof'])->name('ataques.post-flood.cadratrof');
             Route::post('/post-flood/cadastrar', [AttacksController::class, 'post_flood_cadastro'])->name('ataques.post-flood.cadastro');
             Route::get('/post-flood/{id}', [AttacksController::class, 'post_flood_attack'])->name('ataques.post-flood.ataque');
+            /**
+             * **************************************************************************************************************************
+             * XML RPC Flood
+             * **************************************************************************************************************************
+             */
+            Route::get('/xml-rpc-flood', [AttacksController::class, 'xml_rpc_flood_index'])->name('ataques.xml-rpc-flood');
+            Route::get('/xml-rpc-flood/cadastrar', [AttacksController::class, 'xml_rpc_flood_cadastrof'])->name('ataques.xml-rpc-flood.cadratrof');
+            Route::post('/xml-rpc-flood/cadastrar', [AttacksController::class, 'xml_rpc_flood_cadastro'])->name('ataques.xml-rpc-flood.cadastro');
+            Route::get('/xml-rpc-flood/{id}', [AttacksController::class, 'xml_rpc_flood_attack'])->name('ataques.xml-rpc-flood.ataque');
         });  
     });
     /*
