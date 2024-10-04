@@ -1,5 +1,5 @@
 <x-dashboard-layout>
-    <h2 class="mb-4">HTTP Keep-Alive 
+    <h2 class="mb-4">HTTP Slow-POST 
         @if(Auth::user()->isGlobalAdmin()) 
             <b class="text-danger"> (Global Admin) </b> 
         @endif 
@@ -9,23 +9,23 @@
     </h2>
     <div class="collapse pb-2" id="collapseExplain" style="">
         <div class="card card-body">
-            <h5><strong>Entendendo o Ataque HTTP Keep-Alive</strong></h5>
+            <h5><strong>Entendendo o Ataque Slow POST</strong></h5>
             <p>
-                O ataque HTTP Keep-Alive explora uma característica presente no protocolo HTTP, que permite manter conexões abertas por um tempo prolongado, economizando recursos ao evitar múltiplos handshakes. 
-                No entanto, atacantes mal-intencionados podem abusar dessa funcionalidade ao enviar pacotes de dados mínimos e manter a conexão aberta por longos períodos, esgotando os recursos do servidor sem a necessidade de gerar muito tráfego visível.
+                O ataque Slow POST explora a maneira como os servidores processam os pedidos HTTP POST, onde o atacante envia dados de formulário de forma extremamente lenta. O servidor, por padrão, espera até que o corpo da solicitação POST seja completamente recebido, o que permite que atacantes mantenham uma conexão aberta por um longo período sem concluir o envio de dados, esgotando os recursos do servidor.
             </p>
-            <h6><strong>Por que é Efetivo Mesmo com WAF?</strong></h6>
+            <h6><strong>Por que é Difícil de Detectar?</strong></h6>
             <p>
-                Muitos WAFs (Web Application Firewalls) são projetados para detectar e bloquear grandes volumes de solicitações maliciosas ou padrões de ataque conhecidos, mas o HTTP Keep-Alive é difícil de detectar porque não depende de grandes volumes de dados, e sim de uma abordagem mais sutil e prolongada.
+                Ao contrário de ataques tradicionais de negação de serviço, o Slow POST não depende de um grande volume de tráfego, o que torna mais difícil para os WAFs (Web Application Firewalls) detectarem automaticamente. Além disso, o comportamento de envio lento simula uma conexão legítima, dificultando a diferenciação entre um usuário genuíno e um atacante.
             </p>
             <h6><strong>Como Minimizar o Impacto?</strong></h6>
             <ul>
-                <li><strong>Limitação de Conexões Persistentes:</strong> Configurar o servidor para limitar o número de conexões simultâneas ou o tempo máximo permitido para conexões Keep-Alive pode evitar que recursos sejam consumidos por muito tempo.</li>
-                <li><strong>Monitoramento de Conexões Inativas:</strong> Implementar monitoramento constante para identificar padrões de conexão inativa ou de baixa transmissão de dados pode ajudar a detectar tentativas de ataque.</li>
-                <li><strong>Ajustes no Time-out:</strong> Reduzir o tempo de ociosidade permitido para conexões Keep-Alive antes de serem fechadas pelo servidor pode ajudar a reduzir o impacto desse tipo de ataque.</li>
+                <li><strong>Ajuste de Timeouts:</strong> Configurar tempos limite (timeouts) mais curtos para recebimento de dados de POST pode ajudar a fechar conexões que estão tentando se arrastar lentamente, minimizando o consumo de recursos.</li>
+                <li><strong>Limite de Tamanho de Requisição:</strong> Estabelecer limites de tamanho para os dados POST e monitorar a taxa de upload pode identificar tentativas de envio extremamente lento e bloquear o ataque.</li>
+                <li><strong>Monitoramento de Conexões Lentamente Ativas:</strong> Implementar ferramentas de monitoramento que identifiquem conexões que enviam dados de forma irregular ou em baixa velocidade pode ajudar a detectar tentativas de Slow POST.</li>
+                <li><strong>Uso de Servidores Proxy:</strong> Utilizar proxies configurados com limitação de tempo e taxa de envio pode proteger o servidor principal contra essas tentativas de ataque.</li>
             </ul>
             <p>
-                Embora o HTTP Keep-Alive tenha seus benefícios em termos de performance, essas medidas ajudam a equilibrar a segurança, mitigando o potencial de ataques sem prejudicar os usuários legítimos.
+                O ataque Slow POST é efetivo devido à sua natureza furtiva, mas com o ajuste adequado de tempos limite e monitoramento de conexões lentas, é possível minimizar significativamente seu impacto sem afetar os usuários legítimos.
             </p>
         </div>
     </div>
@@ -57,7 +57,7 @@
                 </div>
             @endif
             <div class="d-flex justify-content-end mb-3">
-                <a href="{{ route('ataques.http-keep-alive.cadratrof', absolute: false) }}" class="btn btn-primary btn-lg btn-icon" data-toggle="tooltip" title="Adicionar Análise">
+                <a href="{{ route('ataques.http-slow-post.cadratrof', absolute: false) }}" class="btn btn-primary btn-lg btn-icon" data-toggle="tooltip" title="Adicionar Análise">
                     <i class="fa fa-fw fa-plus"></i>
                 </a>
             </div>
@@ -85,7 +85,7 @@
                             @endif
                             <td>{{ $ataque->status }}</td>
                             <td>
-                            <a href="{{ route('ataques.http-keep-alive.ataque', ['id' => $ataque->id]) }}" class="btn btn-icon btn-pill btn-primary" data-toggle="tooltip" title="Ver"><i class="fa fa-fw fa-eye"></i></a>
+                            <a href="{{ route('ataques.http-slow-post.ataque', ['id' => $ataque->id]) }}" class="btn btn-icon btn-pill btn-primary" data-toggle="tooltip" title="Ver"><i class="fa fa-fw fa-eye"></i></a>
                             <a href="#" class="btn btn-icon btn-pill btn-danger" data-toggle="modal" data-target="#modal_delete" data-item="{{ $ataque->id }}" title="Delete"><i class="fa fa-fw fa-trash"></i></a>
                             </td>
                         </tr>

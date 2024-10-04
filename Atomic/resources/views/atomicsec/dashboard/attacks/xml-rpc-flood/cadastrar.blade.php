@@ -1,5 +1,5 @@
 <x-dashboard-layout>
-    <h2 class="mb-4">Cadastrar Ataque HTTP Keep-Alive @if(Auth::user()->isGlobalAdmin()) <b class="text-danger"> (Global Admin) </b> @endif </h2>
+    <h2 class="mb-4">Cadastrar Ataque XML RPC Flood @if(Auth::user()->isGlobalAdmin()) <b class="text-danger"> (Global Admin) </b> @endif </h2>
     <div class="alert alert-danger" role="alert"> 
         <div class="d-flex justify-content-center">
             <h4 class="alert-heading">Área de risco!</h4>
@@ -11,13 +11,13 @@
     <div class="card mb-4">
         @if(count($applications) > 0)
             <div class="card-header bg-white font-weight-bold">
-            {{ __('Ataque HTTP Keep-Alive para Aplicação da empresa ')}} <b> {{$company->name}} </b>
+            {{ __('Ataque XML RPC Flood para Aplicação da empresa ')}} <b> {{$company->name}} </b>
             </div>
             <div class="card-body">
-                <form id="atacar_form" method="POST" action="{{ route('ataques.http-keep-alive.cadastro') }}">
+                <form id="atacar_form" method="POST" action="{{ route('ataques.xml-rpc-flood.cadastro') }}">
                     @csrf
                     <div class="form-group">
-                        <label for="aplicacao">Escolha uma aplicação: </label>
+                        <label for="aplicacao">Escolha uma aplicação (Suporte apenas para wordpress nesse momento): </label>
                         <select class="form-control" id="aplicacao" name="aplicacao">
                             @foreach($applications as $application)
                                 <option value="{{$application->id}}">{{$application->name}}</option>
@@ -56,11 +56,11 @@
             </div>
         @else
             <div class="card-header bg-white font-weight-bold">
-                {{ __('Não há aplicações/analises cadastradas para a empresa ')}} <b> {{$company->name}} </b>
+                {{ __('Não há aplicações/analises de aplicações Wordpress cadastradas para a empresa ')}} <b> {{$company->name}} </b>
             </div>
             <div class="card-body">
                 <p>
-                    Não existem aplicações cadastradas ou nenhuma aplicação foi analisada. Para realizar um ataque é necessário que exista ao menos uma aplicação cadastrada e analisada.
+                    Não existem aplicações Wordpress cadastrada ou nenhuma aplicação Wordpress foi analisada. Para realizar um ataque é necessário que exista ao menos uma aplicação cadastrada e analisada.
                 </p>
                 <a href="{{ route('analysis.cadastrof', absolute: false) }}" class="btn btn-primary">{{ __('Cadastrar Analise') }}</a>
                 <a href="{{ route('aplicacoes.cadastrarf', absolute: false) }}" class="btn btn-primary">{{ __('Cadastrar Aplicação') }}</a>
@@ -69,7 +69,7 @@
     </div>
     <x-atomicsec-modal 
         modal_id="modal_attack" 
-        titulo="Ataque HTTP Keep-Alive" 
+        titulo="Ataque XML RPC Flood" 
         confirm="true" 
         texto="Tem certeza que deseja atacar essa aplição ?" 
         texto_confirmacao="Atacar" 

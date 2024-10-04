@@ -135,4 +135,33 @@ class AnalysisController extends Controller
         $analysis->delete();
         return redirect(route('analysis.index', absolute: false))->with('success', __('Analise deletada com sucesso.'));
     }
+    /**
+     * Retorna a última análise de uma aplicação em json para requisição AJAX.
+     *
+     * @param int $id O ID da aplicação.
+     * @return JsonResponse Uma resposta JSON contendo as informações da última análise.
+     */
+    public function getLatestAnalysis($id)
+    {
+        // Encontra a aplicação pelo ID
+        $application = Applications::findOrFail($id);
+        if($this->empresa->id != $application->company_id) {
+            return response()->json(['error' => 'Você não tem permissão.'], 401);
+        }
+        // Pega a última análise da aplicação
+        $latestAnalysis = $application->analysis()->latest('created_at')->first();
+
+        if (!$latestAnalysis) {
+            return response()->json(['error' => 'Nenhuma análise encontrada para esta aplicação'], 404);
+        }
+
+        // Retorna as informações da última análise
+        return response()->json([
+            'application_id' => $latestAnalysis->application_id,
+            'analysis' => $latestAnalysis->analysis,
+            'log' => $latestAnalysis->log,
+            'status' => $latestAnalysis->status,
+            'created_at' => $latestAnalysis->created_at,
+        ]);
+    }
 }

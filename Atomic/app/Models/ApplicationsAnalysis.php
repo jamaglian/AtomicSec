@@ -18,6 +18,7 @@ class ApplicationsAnalysis extends Model
     protected $fillable = [
         'application_id',
         'analysis',
+        'pid',
         'log',
         'created_at',
         'updated_at'

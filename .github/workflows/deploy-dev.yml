@@ -73,6 +73,24 @@ jobs:
         GOOS=linux GOARCH=amd64 go build -o HTTP_Keep_Alive
         cp ./HTTP_Keep_Alive /home/runner/work/AtomicSec/AtomicSec/Atomic/bin/attacks/
 
+    - name: Build and set up HTTP Slow Post Attack
+      run: |
+        cd /home/runner/work/AtomicSec/AtomicSec/Attacks/HTTP_Slow-Post/
+        GOOS=linux GOARCH=amd64 go build -o HTTP_Slow_Post
+        cp ./HTTP_Slow_Post /home/runner/work/AtomicSec/AtomicSec/Atomic/bin/attacks/
+
+    - name: Build and set up Post Flood Attack
+      run: |
+        cd /home/runner/work/AtomicSec/AtomicSec/Attacks/Post_Flood
+        GOOS=linux GOARCH=amd64 go build -o Post_Flood
+        cp ./Post_Flood /home/runner/work/AtomicSec/AtomicSec/Atomic/bin/attacks/
+
+    - name: Build and set up XML RPC Flood Attack
+      run: |
+        cd /home/runner/work/AtomicSec/AtomicSec/Attacks/XML_RPC_Flood
+        GOOS=linux GOARCH=amd64 go build -o XML_RPC_Flood
+        cp ./XML_RPC_Flood /home/runner/work/AtomicSec/AtomicSec/Atomic/bin/attacks/
+
     - name: Web platform sync files
       run: |
         rsync -z \

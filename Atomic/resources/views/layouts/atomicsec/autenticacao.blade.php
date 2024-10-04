@@ -22,9 +22,9 @@
         <div class="container h-100">
             <div class="row h-100 justify-content-center align-items-center">
                 <div class="col-md-6">
-                    <div>
+                    <div style="margin-bottom: 2em;">
                         <a href="/">
-                            <img class="rounded mx-auto d-block" style="height: 200px;" src="/images/Logo.png" />
+                            <img class="rounded mx-auto d-block" style="height: 250px;" src="/images/Logo.png" />
                         </a>
                     </div>
                     <div class="card">

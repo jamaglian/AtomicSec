@@ -1,5 +1,5 @@
 <x-dashboard-layout>
-    <h2 class="mb-4">HTTP Keep-Alive 
+    <h2 class="mb-4">XML RPC Flood (Suporte apenas para wordpress nesse momento)
         @if(Auth::user()->isGlobalAdmin()) 
             <b class="text-danger"> (Global Admin) </b> 
         @endif 
@@ -9,26 +9,28 @@
     </h2>
     <div class="collapse pb-2" id="collapseExplain" style="">
         <div class="card card-body">
-            <h5><strong>Entendendo o Ataque HTTP Keep-Alive</strong></h5>
+            <h5><strong>Entendendo o Ataque XML-RPC Flood</strong></h5>
             <p>
-                O ataque HTTP Keep-Alive explora uma característica presente no protocolo HTTP, que permite manter conexões abertas por um tempo prolongado, economizando recursos ao evitar múltiplos handshakes. 
-                No entanto, atacantes mal-intencionados podem abusar dessa funcionalidade ao enviar pacotes de dados mínimos e manter a conexão aberta por longos períodos, esgotando os recursos do servidor sem a necessidade de gerar muito tráfego visível.
+                O ataque XML-RPC Flood é um tipo de negação de serviço (DoS) que explora a API XML-RPC, frequentemente usada em sistemas de gerenciamento de conteúdo como o WordPress. O protocolo XML-RPC permite que clientes remotos façam múltiplas chamadas de funções em uma única requisição. Atacantes podem abusar dessa funcionalidade para enviar um grande número de chamadas em massa, sobrecarregando o servidor e esgotando seus recursos.
             </p>
-            <h6><strong>Por que é Efetivo Mesmo com WAF?</strong></h6>
+            <h6><strong>Por que o XML-RPC Flood é Eficiente?</strong></h6>
             <p>
-                Muitos WAFs (Web Application Firewalls) são projetados para detectar e bloquear grandes volumes de solicitações maliciosas ou padrões de ataque conhecidos, mas o HTTP Keep-Alive é difícil de detectar porque não depende de grandes volumes de dados, e sim de uma abordagem mais sutil e prolongada.
+                A funcionalidade do XML-RPC, especialmente o método <code>system.multicall</code>, permite que múltiplas operações sejam executadas simultaneamente. Isso pode ser utilizado para enviar centenas ou até milhares de requisições em uma única chamada, o que força o servidor a processar um volume massivo de dados. Como resultado, o ataque pode rapidamente consumir CPU e memória, tornando o site lento ou inacessível.
             </p>
             <h6><strong>Como Minimizar o Impacto?</strong></h6>
             <ul>
-                <li><strong>Limitação de Conexões Persistentes:</strong> Configurar o servidor para limitar o número de conexões simultâneas ou o tempo máximo permitido para conexões Keep-Alive pode evitar que recursos sejam consumidos por muito tempo.</li>
-                <li><strong>Monitoramento de Conexões Inativas:</strong> Implementar monitoramento constante para identificar padrões de conexão inativa ou de baixa transmissão de dados pode ajudar a detectar tentativas de ataque.</li>
-                <li><strong>Ajustes no Time-out:</strong> Reduzir o tempo de ociosidade permitido para conexões Keep-Alive antes de serem fechadas pelo servidor pode ajudar a reduzir o impacto desse tipo de ataque.</li>
+                <li><strong>Desabilitar o XML-RPC:</strong> Se o XML-RPC não for necessário para o funcionamento do site, desabilitá-lo completamente é uma das formas mais eficazes de se proteger contra esse tipo de ataque.</li>
+                <li><strong>Bloquear o Método Multicall:</strong> Se o XML-RPC for essencial para o site, você pode bloquear o uso do método <code>system.multicall</code>, que é comumente explorado nesses ataques.</li>
+                <li><strong>Implementar Rate Limiting:</strong> Limitar o número de requisições XML-RPC permitidas por IP em um determinado período pode reduzir a eficácia do ataque, impedindo que um único IP envie múltiplas chamadas rapidamente.</li>
+                <li><strong>Monitoramento e Filtragem de Requisições:</strong> Configurar o servidor para monitorar chamadas XML-RPC suspeitas e bloquear requisições excessivas ou padrões anômalos pode mitigar o ataque em tempo real.</li>
+                <li><strong>Uso de WAF:</strong> Um Web Application Firewall (WAF) bem configurado pode identificar e bloquear ataques XML-RPC, especialmente aqueles que utilizam múltiplas chamadas de função em uma única requisição.</li>
             </ul>
             <p>
-                Embora o HTTP Keep-Alive tenha seus benefícios em termos de performance, essas medidas ajudam a equilibrar a segurança, mitigando o potencial de ataques sem prejudicar os usuários legítimos.
+                O XML-RPC Flood é uma técnica poderosa que pode ser devastadora quando explorada de forma maliciosa, mas desativar ou proteger adequadamente a API XML-RPC e implementar limites e monitoramento são passos essenciais para minimizar o impacto desse ataque.
             </p>
         </div>
     </div>
+
 
     <div class="alert alert-danger" role="alert"> 
         <div class="d-flex justify-content-center">
@@ -57,7 +59,7 @@
                 </div>
             @endif
             <div class="d-flex justify-content-end mb-3">
-                <a href="{{ route('ataques.http-keep-alive.cadratrof', absolute: false) }}" class="btn btn-primary btn-lg btn-icon" data-toggle="tooltip" title="Adicionar Análise">
+                <a href="{{ route('ataques.xml-rpc-flood.cadratrof', absolute: false) }}" class="btn btn-primary btn-lg btn-icon" data-toggle="tooltip" title="Adicionar Análise">
                     <i class="fa fa-fw fa-plus"></i>
                 </a>
             </div>
@@ -85,7 +87,7 @@
                             @endif
                             <td>{{ $ataque->status }}</td>
                             <td>
-                            <a href="{{ route('ataques.http-keep-alive.ataque', ['id' => $ataque->id]) }}" class="btn btn-icon btn-pill btn-primary" data-toggle="tooltip" title="Ver"><i class="fa fa-fw fa-eye"></i></a>
+                            <a href="{{ route('ataques.xml-rpc-flood.ataque', ['id' => $ataque->id]) }}" class="btn btn-icon btn-pill btn-primary" data-toggle="tooltip" title="Ver"><i class="fa fa-fw fa-eye"></i></a>
                             <a href="#" class="btn btn-icon btn-pill btn-danger" data-toggle="modal" data-target="#modal_delete" data-item="{{ $ataque->id }}" title="Delete"><i class="fa fa-fw fa-trash"></i></a>
                             </td>
                         </tr>

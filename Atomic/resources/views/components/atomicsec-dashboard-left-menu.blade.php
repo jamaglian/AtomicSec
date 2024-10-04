@@ -40,7 +40,10 @@
                 </ul>
             </li>
             <li {!! (
-                ( request()->routeIs('analysis.index') ?
+                (   (
+                        request()->routeIs('ataques.http-keep-alive')
+                        || request()->routeIs('ataques.http-slow-post')
+                    ) ?
                     'class="active"'
                         : 
                     '' 
@@ -55,6 +58,9 @@
                         (
                             ( 
                                 request()->routeIs('ataques.http-keep-alive')
+                                || request()->routeIs('ataques.http-slow-post')
+                                || request()->routeIs('ataques.post-flood')
+                                || request()->routeIs('ataques.xml-rpc-flood')
                             )? 
                                 'class="list-unstyled collapse show"' :
                                 'class="list-unstyled collapse"' 
@@ -63,6 +69,9 @@
                     class="list-unstyled collapse"
                 >
                     <li><a href="{{route('ataques.http-keep-alive')}}">{{ __('HTTP Keep-Alive') }}</a></li>
+                    <li><a href="{{route('ataques.http-slow-post')}}">{{ __('HTTP Slow-Post') }}</a></li>
+                    <li><a href="{{route('ataques.post-flood')}}">{{ __('Post Flood') }}</a></li>
+                    <li><a href="{{route('ataques.xml-rpc-flood')}}">{{ __('XML RPC Flood') }}</a></li>
                 </ul>
             </li>
         @else

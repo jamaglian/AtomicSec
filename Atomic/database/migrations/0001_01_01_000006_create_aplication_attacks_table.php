@@ -23,6 +23,18 @@ return new class extends Migration
             'name' => 'HTTP Keep-Alive',
             'params' => json_encode(['url' => 'url', 'proxys_virgulados' => 'proxys', 'threads' => 0]),
         ]);
+        \App\Models\AttackType::create([
+            'name' => 'HTTP Slow-POST',
+            'params' => json_encode(['url' => 'url', 'proxys_virgulados' => 'proxys', 'threads' => 0]),
+        ]);
+        \App\Models\AttackType::create([
+            'name' => 'Post-Flood',
+            'params' => json_encode(['url' => 'url', 'proxys_virgulados' => 'proxys', 'threads' => 0]),
+        ]);
+        \App\Models\AttackType::create([
+            'name' => 'XML RPC Flood',
+            'params' => json_encode(['url' => 'url', 'proxys_virgulados' => 'proxys', 'threads' => 0]),
+        ]);
         Schema::create('application_attacks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('application_id')->unsigned();
@@ -31,7 +43,9 @@ return new class extends Migration
             $table->foreign('attacks_types_id')->references('id')->on('attacks_types');
             $table->json('attack_params')->nullable();
             $table->json('attack_analysis')->nullable();
+            $table->unsignedInteger('pid')->nullable();
             $table->longText('log')->nullable();
+            $table->string('job_uuid')->nullable();
             $table->string('status')->default('Pendente');
             $table->timestamp('started_at')->nullable();
             $table->timestamp('finish_at')->nullable();

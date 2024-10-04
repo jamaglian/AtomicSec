@@ -1,5 +1,5 @@
 <x-dashboard-layout>
-    <h2 class="mb-4">HTTP Keep-Alive 
+    <h2 class="mb-4">Post-Flood 
         @if(Auth::user()->isGlobalAdmin()) 
             <b class="text-danger"> (Global Admin) </b> 
         @endif 
@@ -9,23 +9,24 @@
     </h2>
     <div class="collapse pb-2" id="collapseExplain" style="">
         <div class="card card-body">
-            <h5><strong>Entendendo o Ataque HTTP Keep-Alive</strong></h5>
+            <h5><strong>Entendendo o Ataque POST Flood</strong></h5>
             <p>
-                O ataque HTTP Keep-Alive explora uma característica presente no protocolo HTTP, que permite manter conexões abertas por um tempo prolongado, economizando recursos ao evitar múltiplos handshakes. 
-                No entanto, atacantes mal-intencionados podem abusar dessa funcionalidade ao enviar pacotes de dados mínimos e manter a conexão aberta por longos períodos, esgotando os recursos do servidor sem a necessidade de gerar muito tráfego visível.
+                O ataque POST Flood é um tipo de ataque DDoS (Distributed Denial of Service) que sobrecarrega o servidor ao enviar um grande volume de requisições POST em um curto espaço de tempo. Cada requisição POST contém dados que precisam ser processados, resultando em um alto consumo de recursos como CPU, memória e largura de banda, o que pode deixar o servidor lento ou até mesmo indisponível.
             </p>
-            <h6><strong>Por que é Efetivo Mesmo com WAF?</strong></h6>
+            <h6><strong>Por que o POST Flood é Perigoso?</strong></h6>
             <p>
-                Muitos WAFs (Web Application Firewalls) são projetados para detectar e bloquear grandes volumes de solicitações maliciosas ou padrões de ataque conhecidos, mas o HTTP Keep-Alive é difícil de detectar porque não depende de grandes volumes de dados, e sim de uma abordagem mais sutil e prolongada.
+                Como as requisições POST geralmente envolvem processamento no lado do servidor (como gravação de dados ou geração de respostas dinâmicas), elas exigem mais recursos do que requisições GET. Um ataque de POST Flood pode rapidamente exaurir os recursos do servidor, afetando o desempenho e a capacidade de atender a usuários legítimos. Além disso, o ataque pode ser distribuído entre várias máquinas, tornando difícil bloquear todos os IPs envolvidos.
             </p>
             <h6><strong>Como Minimizar o Impacto?</strong></h6>
             <ul>
-                <li><strong>Limitação de Conexões Persistentes:</strong> Configurar o servidor para limitar o número de conexões simultâneas ou o tempo máximo permitido para conexões Keep-Alive pode evitar que recursos sejam consumidos por muito tempo.</li>
-                <li><strong>Monitoramento de Conexões Inativas:</strong> Implementar monitoramento constante para identificar padrões de conexão inativa ou de baixa transmissão de dados pode ajudar a detectar tentativas de ataque.</li>
-                <li><strong>Ajustes no Time-out:</strong> Reduzir o tempo de ociosidade permitido para conexões Keep-Alive antes de serem fechadas pelo servidor pode ajudar a reduzir o impacto desse tipo de ataque.</li>
+                <li><strong>Rate Limiting:</strong> Implementar limites de taxa (rate limiting) por IP ou sessão pode ajudar a evitar que um único atacante ou um grupo de atacantes sobrecarregue o servidor com um grande volume de requisições POST.</li>
+                <li><strong>CAPTCHA em Formulários:</strong> Adicionar CAPTCHAs em formulários que utilizam requisições POST pode impedir que bots automatizados realizem ataques de POST Flood em massa.</li>
+                <li><strong>Verificação de Padrões Anômalos:</strong> Monitorar o tráfego em busca de padrões incomuns, como um grande número de requisições POST vindas de poucos IPs em um curto período, permite identificar e bloquear ataques rapidamente.</li>
+                <li><strong>Filtragem por WAF:</strong> Configurar um Web Application Firewall (WAF) para detectar e bloquear requisições POST excessivas ou que apresentem padrões de ataque pode mitigar o impacto de POST Floods.</li>
+                <li><strong>Cacheamento de Respostas:</strong> Sempre que possível, cachear as respostas das requisições POST pode reduzir a carga do servidor, já que respostas repetidas não precisariam ser processadas novamente.</li>
             </ul>
             <p>
-                Embora o HTTP Keep-Alive tenha seus benefícios em termos de performance, essas medidas ajudam a equilibrar a segurança, mitigando o potencial de ataques sem prejudicar os usuários legítimos.
+                O POST Flood pode ser devastador quando um servidor não está preparado para lidar com grandes volumes de requisições, mas com as medidas corretas de limitação de taxa, autenticação via CAPTCHA e monitoramento ativo, é possível mitigar seus efeitos e proteger o servidor.
             </p>
         </div>
     </div>
@@ -57,7 +58,7 @@
                 </div>
             @endif
             <div class="d-flex justify-content-end mb-3">
-                <a href="{{ route('ataques.http-keep-alive.cadratrof', absolute: false) }}" class="btn btn-primary btn-lg btn-icon" data-toggle="tooltip" title="Adicionar Análise">
+                <a href="{{ route('ataques.post-flood.cadratrof', absolute: false) }}" class="btn btn-primary btn-lg btn-icon" data-toggle="tooltip" title="Adicionar Análise">
                     <i class="fa fa-fw fa-plus"></i>
                 </a>
             </div>
@@ -85,7 +86,7 @@
                             @endif
                             <td>{{ $ataque->status }}</td>
                             <td>
-                            <a href="{{ route('ataques.http-keep-alive.ataque', ['id' => $ataque->id]) }}" class="btn btn-icon btn-pill btn-primary" data-toggle="tooltip" title="Ver"><i class="fa fa-fw fa-eye"></i></a>
+                            <a href="{{ route('ataques.post-flood.ataque', ['id' => $ataque->id]) }}" class="btn btn-icon btn-pill btn-primary" data-toggle="tooltip" title="Ver"><i class="fa fa-fw fa-eye"></i></a>
                             <a href="#" class="btn btn-icon btn-pill btn-danger" data-toggle="modal" data-target="#modal_delete" data-item="{{ $ataque->id }}" title="Delete"><i class="fa fa-fw fa-trash"></i></a>
                             </td>
                         </tr>

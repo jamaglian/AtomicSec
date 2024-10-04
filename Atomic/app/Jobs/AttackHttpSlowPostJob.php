@@ -10,7 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Throwable;
 
-class AttackHttpKeepAliveJob implements ShouldQueue
+class AttackHttpSlowPostJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -45,8 +45,14 @@ class AttackHttpKeepAliveJob implements ShouldQueue
             $this->applicationsAttack->job_uuid = $this->job->uuid();
             $this->applicationsAttack->save(); // Salva o log em tempo real
             $params = json_decode($this->applicationsAttack->attack_params, true);
-            // Comando para iniciar o container Docker
-            $attackCommand = env('ATTACKS_DATA_PATH', '/var/www/html/bin/attacks/') . "HTTP_Keep_Alive -url={$this->applicationsAttack->application->url} -threads={$params['atacantes']} -process-timeout={$params['tempo']} " . (($params['use_proxy'] == 'yes' && env('PROXY_TO_USE', '') != '')? "-proxies=" . env('PROXY_TO_USE', ''):'');
+            //Inicia com o caminho base dos binários de ataques.
+            $attackCommand = env('ATTACKS_DATA_PATH', '/var/www/html/bin/attacks/');
+            //Adiciona o nome do binário do ataque bem como os parametros obrigátórios.
+            $attackCommand .= "HTTP_Slow_Post -url=\"{$params['url']}\" -params=\"{$params['params_post']}\" -workers={$params['atacantes']} -process-timeout={$params['tempo']} ";
+            //Adiciona o proxy se aplicável.
+            $attackCommand .= (($params['use_proxy'] == 'yes' && env('PROXY_TO_USE', '') != '')? "-proxies=" . env('PROXY_TO_USE', ''):'');
+            //Adiciona o tamanho do corpo da requisição.
+            $attackCommand .= " -bodysize=" . $params['tamanho_corpo'];
             // Abre um pipe para o processo Docker
             $process = proc_open($attackCommand, [1 => ['pipe', 'w']], $pipes);
 
@@ -57,8 +63,6 @@ class AttackHttpKeepAliveJob implements ShouldQueue
                 $status = proc_get_status($process);
                 $this->applicationsAttack->pid = $status['pid'] + 1; // O PID do processo
                 $this->applicationsAttack->save();
-
-                
                 while (!feof($pipes[1])) {
                     $line = fgets($pipes[1]);
                     $buffer .= $line;
@@ -91,7 +95,6 @@ class AttackHttpKeepAliveJob implements ShouldQueue
                 $this->applicationsAttack->status = 'Finalizado.';
                 $this->applicationsAttack->finish_at = now();
                 $this->applicationsAttack->save();
-                
             }else{
                 $this->applicationsAttack->log .= 'Erro ao abrir o processo.';
                 $this->applicationsAttack->status = 'Erro.';

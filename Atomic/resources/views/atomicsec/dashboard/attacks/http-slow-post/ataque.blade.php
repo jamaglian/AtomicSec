@@ -1,5 +1,5 @@
 <x-dashboard-layout >
-    <h2 class="mb-4">Ataque HTTP Keep-Alive @if(Auth::user()->isGlobalAdmin()) <b class="text-danger"> (Global Admin) </b> @endif </h2>
+    <h2 class="mb-4">HTTP Slow-POST  @if(Auth::user()->isGlobalAdmin()) <b class="text-danger"> (Global Admin) </b> @endif </h2>
     <div class="card mb-4">
         <div class="card-header d-flex justify-content-between align-items-center bg-white font-weight-bold">
             <div>
