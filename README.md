@@ -1,4 +1,5 @@
-# 🌐 SILENTSTRIKE
+# 🌐 SILENTSTRIKE 
+by Atomicsec
 
 ## 🏆 Sobre o Projeto
 
